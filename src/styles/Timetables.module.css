@@ -1,0 +1,182 @@
+/* src/pages/Timetables.module.css */
+:root {
+  --bg: #0b1020;
+  --panel: #111833;
+  --line: #22305f;
+  --text: #eaf0ff;
+  --muted: #a6b0cf;
+  --accent: #5b8cff;
+  --l: #5b8cff;
+  --t: #bb86fc;
+  --p: #31d0aa;
+  --radius: 12px;
+}
+
+.wrap {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+}
+.header {
+  border-bottom: 1px solid var(--line);
+  padding: 18px 20px;
+  background: #0a0f22;
+  position: sticky;
+  top: 0;
+  z-index: 4;
+}
+.title {
+  margin: 0 0 6px;
+  font-size: 28px;
+}
+.subtitle {
+  margin: 0;
+  color: var(--muted);
+}
+
+.main {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 18px 20px;
+  display: grid;
+  gap: 12px;
+}
+.toolbar {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 12px;
+}
+.sectionTitle {
+  margin: 0 0 10px;
+  font-size: 18px;
+}
+.filters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  align-items: end;
+}
+.label {
+  display: grid;
+  gap: 6px;
+}
+.input,
+select {
+  background: #0c1430;
+  border: 1px solid var(--line);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 10px;
+}
+.actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 12px;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.table th,
+.table td {
+  border-bottom: 1px solid #192653;
+  padding: 8px;
+  text-align: left;
+  vertical-align: top;
+}
+.table thead th {
+  color: var(--muted);
+  font-weight: 700;
+}
+.caption {
+  text-align: left;
+  color: var(--muted);
+  padding: 6px 0;
+}
+
+.cellList {
+  display: grid;
+  gap: 6px;
+}
+.pill {
+  display: grid;
+  gap: 2px;
+  background: #0c1430;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px;
+}
+.pillCode {
+  font-weight: 800;
+  font-size: 12px;
+}
+.pillMeta {
+  font-size: 12px;
+  color: var(--muted);
+}
+.lecture {
+  border-color: rgba(91, 140, 255, 0.5);
+  box-shadow: inset 0 0 0 2px rgba(91, 140, 255, 0.15);
+}
+.tutorial {
+  border-color: rgba(187, 134, 252, 0.5);
+  box-shadow: inset 0 0 0 2px rgba(187, 134, 252, 0.15);
+}
+.practical {
+  border-color: rgba(49, 208, 170, 0.5);
+  box-shadow: inset 0 0 0 2px rgba(49, 208, 170, 0.15);
+}
+
+.legend {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  color: var(--muted);
+  margin-top: 10px;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  color: #0a0f22;
+  font-weight: 800;
+}
+.badge.lecture {
+  background: var(--l);
+}
+.badge.tutorial {
+  background: var(--t);
+}
+.badge.practical {
+  background: var(--p);
+}
+
+.primaryBtn,
+.secondaryBtn {
+  border-radius: 10px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  font-weight: 700;
+  text-decoration: none;
+}
+.secondaryBtn {
+  background: transparent;
+  color: var(--text);
+}
+
+@media (max-width: 1024px) {
+  .filters {
+    grid-template-columns: 1fr 1fr;
+  }
+}

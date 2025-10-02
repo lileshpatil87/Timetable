@@ -1,0 +1,241 @@
+/* src/pages/RoomsResources.module.css */
+:root {
+  --bg: #0b1020;
+  --panel: #111833;
+  --line: #22305f;
+  --text: #eaf0ff;
+  --muted: #a6b0cf;
+  --accent: #5b8cff;
+  --radius: 12px;
+}
+
+.wrap {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+}
+.header {
+  border-bottom: 1px solid var(--line);
+  padding: 18px 20px;
+  background: #0a0f22;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+.title {
+  margin: 0 0 6px;
+  font-size: 28px;
+}
+.subtitle {
+  margin: 0;
+  color: var(--muted);
+}
+
+.main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 18px 20px;
+  display: grid;
+  gap: 12px;
+}
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+
+.sectionTitle {
+  margin: 0 0 10px;
+  font-size: 18px;
+}
+.caption {
+  text-align: left;
+  color: var(--muted);
+  padding: 6px 0;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+.label {
+  display: grid;
+  gap: 6px;
+}
+.input,
+select {
+  background: #0c1430;
+  border: 1px solid var(--line);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.table th,
+.table td {
+  text-align: left;
+  border-bottom: 1px solid #192653;
+  padding: 8px;
+}
+.table thead th {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.linkBtn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+.rowSelected {
+  background: rgba(91, 140, 255, 0.08);
+}
+
+.drawer {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: grid;
+  place-items: center;
+  z-index: 20;
+}
+.drawerInner {
+  width: min(980px, 96vw);
+  max-height: 92vh;
+  overflow: auto;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.drawerHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+}
+.closeBtn {
+  background: #0c1430;
+  border: 1px solid var(--line);
+  color: var(--text);
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+}
+
+.form {
+  padding: 12px 14px;
+  display: grid;
+  gap: 12px;
+}
+.fieldset {
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  padding: 10px;
+}
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.equipRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.tag {
+  background: #0c1430;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 8px;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+.inputSmall {
+  background: #0c1430;
+  border: 1px solid var(--line);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 8px;
+}
+.labelInline {
+  display: grid;
+  grid-template-columns: 1fr 140px;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.heat {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  padding: 8px 0;
+}
+.cell {
+  display: block;
+  height: 18px;
+  background: linear-gradient(180deg, #5b8cff, #31d0aa);
+  border-radius: 6px;
+}
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+}
+.legendBar {
+  width: 120px;
+  height: 8px;
+  background: linear-gradient(
+    90deg,
+    rgba(91, 140, 255, 0.2),
+    rgba(49, 208, 170, 1)
+  );
+  border-radius: 6px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+.primaryBtn,
+.secondaryBtn {
+  border-radius: 10px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  font-weight: 700;
+}
+.primaryBtn {
+  background: var(--accent);
+  color: #0a0f22;
+}
+.secondaryBtn {
+  background: transparent;
+  color: var(--text);
+}
+
+@media (max-width: 1000px) {
+  .filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+}

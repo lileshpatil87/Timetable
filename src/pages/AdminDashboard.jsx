@@ -119,7 +119,7 @@ export default function AdminDashboard() {
               { path: "/admin", label: "Dashboard", active: true },
               { path: "/programs", label: "Programs" },
               { path: "/courses", label: "Courses" },
-              { path: "/faculty", label: "Faculty" },
+              { path: "/faculties", label: "Faculty" },
               { path: "/rooms", label: "Rooms" },
               { path: "/students", label: "Students" },
               { path: "/calendars", label: "Calendars" },

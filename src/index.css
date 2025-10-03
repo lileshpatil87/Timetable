@@ -1,5 +1,16 @@
 @import "tailwindcss";
 
+/* e.g., src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .scrollbar-hidden::-webkit-scrollbar { display: none; }     /* Chrome/Safari/Edge/Opera */
+  .scrollbar-hidden { scrollbar-width: none; -ms-overflow-style: none; } /* Firefox/IE */
+}
+
+
 /* :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

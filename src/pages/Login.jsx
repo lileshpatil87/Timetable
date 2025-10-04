@@ -10,7 +10,7 @@ import {
   ArrowRightIcon,
   CalendarDaysIcon,
 } from "lucide-react";
-const ROLES = ["Student", "Faculty", "HOD", "Dean"]; // Dean maps to /admin
+const ROLES = ["Student", "Faculty", "HOD", "Dean", "Staff"];
 export default function Login() {
   const [showPwd, setShowPwd] = useState(false);
   const [form, setForm] = useState({
@@ -71,6 +71,11 @@ export default function Login() {
         break;
       case "Dean":
         navigate("/dean", {
+          replace: true,
+        });
+        break;
+      case "Staff":
+        navigate("/staff", {
           replace: true,
         });
         break;
@@ -334,21 +339,28 @@ export default function Login() {
               >
                 Role
               </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                  <UserIcon className="h-5 w-5 text-slate-500" />
-                </div>
+              <div className="relative h-11">
                 <select
                   id="role"
                   name="role"
                   value={form.role}
                   onChange={onChange}
                   required
-                  className={`w-full rounded-xl border bg-slate-800/50 pl-10 px-3 py-2.5 text-slate-100 appearance-none focus:ring-2 focus:ring-indigo-400/50 transition-all duration-200 ${
+                  className={`w-full rounded-xl border bg-slate-800/50 pl-10 px-3 pr-12 py-2.5 text-slate-100 appearance-none focus:ring-2 focus:ring-indigo-400/50 transition-all duration-200 ${
                     errors.role
                       ? "border-red-500/60 focus:border-red-400"
                       : "border-slate-700/50 focus:border-indigo-400"
                   }`}
+                  style={{
+                    backgroundImage:
+                      'url("data:image/svg+xml;utf8,<svg xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 20 20\\" fill=\\"%2394a3b8\\"><path fill-rule=\\"evenodd\\" d=\\"M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z\\" clip-rule=\\"evenodd\\"/></svg>")',
+                    backgroundRepeat: "no-repeat",
+                    backgroundPosition: "right 0.75rem center",
+                    backgroundSize: "1.25rem 1.25rem",
+                    WebkitAppearance: "none",
+                    MozAppearance: "none",
+                    appearance: "none",
+                  }}
                   aria-invalid={!!errors.role}
                   aria-errormessage={errors.role ? "role-error" : undefined}
                 >
@@ -358,11 +370,13 @@ export default function Login() {
                     </option>
                   ))}
                 </select>
-                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 z-10">
                   <svg
                     className="h-5 w-5 text-slate-500"
                     viewBox="0 0 20 20"
                     fill="currentColor"
+                    aria-hidden="true"
                   >
                     <path
                       fillRule="evenodd"
@@ -372,6 +386,7 @@ export default function Login() {
                   </svg>
                 </div>
               </div>
+
               {errors.role && (
                 <p
                   id="role-error"

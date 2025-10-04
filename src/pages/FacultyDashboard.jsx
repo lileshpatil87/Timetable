@@ -320,28 +320,6 @@ export default function FacultyDashboard() {
                     </div>
                   </dl>
                 </div>
-                <div className="p-3 rounded-xl bg-slate-800/50 border border-slate-700/50">
-                  <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
-                    <BarChart3 size={14} className="text-emerald-400" />
-                    Progress
-                  </h3>
-                  <div className="h-2 rounded-full bg-slate-700/50 overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"
-                      style={{
-                        width: `${
-                          (faculty.assignedHours / faculty.targetHours) * 100
-                        }%`,
-                      }}
-                    ></div>
-                  </div>
-                  <div className="flex justify-between mt-1.5 text-xs">
-                    <span className="text-slate-400">Assigned</span>
-                    <span className="font-medium">
-                      {faculty.assignedHours}/{faculty.targetHours} hrs
-                    </span>
-                  </div>
-                </div>
               </div>
             </div>
           </div>

@@ -1,66 +1,37 @@
 import { NavLink } from "react-router-dom";
 import {
-  LayoutDashboardIcon,
-  CheckCircleIcon,
-  AlertTriangleIcon,
-  CalendarIcon,
+  LayoutDashboard,
+  BookOpen,
+  Eye,
+  Building2,
+  UserPlus,
+  Users,
+  GraduationCap,
+  DoorOpen,
+  UsersRound,
+  Calendar,
+  CheckCircle,
+  AlertTriangle,
+  Download,
+  UserCheck,
 } from "lucide-react";
 import { useState } from "react";
 
 const menuItems = [
-  {
-    title: "Dashboard",
-    url: "/hod",
-    icon: LayoutDashboardIcon,
-  },
-  {
-    title: "Program",
-    url: "/programs",
-    icon: LayoutDashboardIcon,
-  },
-  {
-    title: "Courses",
-    url: "/courses",
-    icon: LayoutDashboardIcon,
-  },
-  {
-    title: "Faculties",
-    url: "/faculties",
-    icon: LayoutDashboardIcon,
-  },
-  {
-    title: "Rooms",
-    url: "/rooms",
-    icon: LayoutDashboardIcon,
-  },
-  {
-    title: "Students",
-    url: "/students",
-    icon: LayoutDashboardIcon,
-  },
-  {
-    title: "Timetables",
-    url: "/timetables",
-    icon: LayoutDashboardIcon,
-  },
-  {
-    title: "Approval Queue",
-    url: "/approvals",
-    icon: CheckCircleIcon,
-  },
-  {
-    title: "Reported Clashes",
-    url: "/clashes",
-    icon: AlertTriangleIcon,
-  },
-  {
-    title: "Exports",
-    url: "/exports",
-    icon: LayoutDashboardIcon,
-  },
+  { title: "Dashboard", url: "/dean", icon: LayoutDashboard },
+  { title: "View Programs", url: "/dean/view", icon: Eye },
+  { title: "View Rooms", url: "/dean/viewr", icon: DoorOpen },
+  { title: "Register HOD", url: "/dean/register", icon: UserPlus },
+  { title: "Courses", url: "/dean/courses", icon: BookOpen },
+  { title: "Faculties", url: "/dean/faculties", icon: UsersRound },
+  { title: "Students", url: "/dean/students", icon: UserCheck },
+  { title: "Timetables", url: "/dean/timetables", icon: Calendar },
+  { title: "Approval Queue", url: "/dean/approvals", icon: CheckCircle },
+  { title: "Reported Clashes", url: "/dean/clashes", icon: AlertTriangle },
+  { title: "Exports", url: "/dean/exports", icon: Download },
 ];
 
-export function AppSidebar() {
+export default function DeanSidebar() {
   const [collapsed, setCollapsed] = useState(false);
 
   return (

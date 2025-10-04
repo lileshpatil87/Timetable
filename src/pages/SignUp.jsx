@@ -15,29 +15,7 @@ import {
   ChevronRightIcon,
   CalendarDaysIcon,
 } from "lucide-react";
-const DEPARTMENTS = [
-  "Computer Science",
-  "Electronics",
-  "Mechanical",
-  "Civil",
-  "Mathematics",
-  "Management",
-];
-const ELECTIVES = [
-  "AI & ML",
-  "Data Science",
-  "IoT Systems",
-  "Cloud Computing",
-  "Cyber Security",
-];
-const FACULTY_SUBJECTS = [
-  "Algorithms",
-  "Operating Systems",
-  "Database Systems",
-  "Networks",
-  "Mathematics",
-  "Physics",
-];
+
 const TABS = [
   {
     id: "personal",
@@ -45,21 +23,18 @@ const TABS = [
     icon: UserIcon,
   },
   {
-    id: "role",
-    label: "User Specific",
-    icon: BookIcon,
-  },
-  {
     id: "password",
     label: "Password",
     icon: LockIcon,
   },
 ];
+
 export default function SignUp() {
   const [active, setActive] = useState("personal");
   const tabRefs = useRef({});
   const navigate = useNavigate();
-  // Tab 1: Personal
+
+  // Tab 1: Personal (role locked to Dean)
   const [personal, setPersonal] = useState({
     id: "",
     name: "",
@@ -67,23 +42,9 @@ export default function SignUp() {
     contact: "",
     universityCode: "",
     instituteCode: "",
-    role: "Student",
+    role: "Dean",
   });
-  // Tab 2: Role-specific
-  const [student, setStudent] = useState({
-    department: "",
-    elective: "",
-    totalCredits: "",
-  });
-  const [faculty, setFaculty] = useState({
-    department: "",
-    expertise: [],
-    availability: "",
-  });
-  const [hod, setHod] = useState({
-    department: "",
-    approveTimetables: true,
-  });
+
   // Tab 3: Password
   const [security, setSecurity] = useState({
     password: "",
@@ -91,9 +52,11 @@ export default function SignUp() {
     show1: false,
     show2: false,
   });
+
   // Errors
   const [errors, setErrors] = useState({}); // { fieldId: message }
   const [formAlert, setFormAlert] = useState("");
+
   // Pure predicates for JSX (no state updates)
   const isPersonalComplete =
     !!personal.id &&
@@ -103,25 +66,19 @@ export default function SignUp() {
     !!personal.contact &&
     !!personal.universityCode &&
     !!personal.instituteCode;
-  const isRoleComplete =
-    personal.role === "Student"
-      ? !!student.department &&
-        !!student.elective &&
-        student.totalCredits !== ""
-      : personal.role === "Faculty"
-      ? !!faculty.department &&
-        faculty.expertise.length > 0 &&
-        !!faculty.availability
-      : personal.role === "HOD"
-      ? !!hod.department
-      : true; // Dean
+
+  // Dean has no role-specific fields; always complete
+  const isRoleComplete = true;
+
   const isPasswordComplete =
     security.password.length >= 8 &&
     security.password === security.confirmPassword;
+
   // Calculate current step (1-indexed)
   const currentStep = TABS.findIndex((tab) => tab.id === active) + 1;
   const totalSteps = TABS.length;
   const progress = (currentStep / totalSteps) * 100;
+
   // Validation that sets error state, called only on Next/Submit
   function validatePersonal() {
     let ok = true;
@@ -155,48 +112,13 @@ export default function SignUp() {
     setFormAlert(ok ? "" : "Fix errors in Personal Details");
     return ok;
   }
+
+  // No-op for Dean
   function validateRole() {
-    let ok = true;
-    const next = {};
-    if (personal.role === "Student") {
-      if (!student.department) {
-        ok = false;
-        next["student-dept"] = "Select department";
-      }
-      if (!student.elective) {
-        ok = false;
-        next["student-elective"] = "Select elective";
-      }
-      if (student.totalCredits === "") {
-        ok = false;
-        next["student-credits"] = "Enter total credits";
-      }
-    } else if (personal.role === "Faculty") {
-      if (!faculty.department) {
-        ok = false;
-        next["faculty-dept"] = "Select department";
-      }
-      if (faculty.expertise.length === 0) {
-        ok = false;
-        next["faculty-expertise"] = "Select at least one expertise";
-      }
-      if (!faculty.availability) {
-        ok = false;
-        next["faculty-availability"] = "Enter availability";
-      }
-    } else if (personal.role === "HOD") {
-      if (!hod.department) {
-        ok = false;
-        next["hod-dept"] = "Select department";
-      }
-    }
-    setErrors((e) => ({
-      ...e,
-      ...next,
-    }));
-    setFormAlert(ok ? "" : "Fix errors in User Specific tab");
-    return ok;
+    setFormAlert("");
+    return true;
   }
+
   function validatePassword() {
     let ok = true;
     const next = {};
@@ -215,12 +137,14 @@ export default function SignUp() {
     setFormAlert(ok ? "" : "Fix errors in Password tab");
     return ok;
   }
+
   function setFieldError(id, msg) {
     setErrors((e) => ({
       ...e,
       [id]: msg,
     }));
   }
+
   function clearFieldError(id) {
     setErrors((e) => {
       const copy = {
@@ -230,6 +154,7 @@ export default function SignUp() {
       return copy;
     });
   }
+
   function goNext() {
     if (active === "personal" && !validatePersonal()) return;
     if (active === "role" && !validateRole()) return;
@@ -238,12 +163,14 @@ export default function SignUp() {
     setActive(next);
     tabRefs.current[next]?.focus();
   }
+
   function goBack() {
     const idx = TABS.findIndex((t) => t.id === active);
     const prev = TABS[Math.max(0, idx - 1)].id;
     setActive(prev);
     tabRefs.current[prev]?.focus();
   }
+
   function onKeyDownTabs(e) {
     const idx = TABS.findIndex((t) => t.id === active);
     if (e.key === "ArrowRight") {
@@ -266,6 +193,7 @@ export default function SignUp() {
       e.preventDefault();
     }
   }
+
   function submit(e) {
     e.preventDefault();
     const p = validatePersonal();
@@ -284,10 +212,7 @@ export default function SignUp() {
       return;
     }
     const payload = {
-      ...personal,
-      student: personal.role === "Student" ? student : undefined,
-      faculty: personal.role === "Faculty" ? faculty : undefined,
-      hod: personal.role === "HOD" ? hod : undefined,
+      ...personal, // role is "Dean"
       password: security.password,
     };
     // TODO: await api.signup(payload)
@@ -298,6 +223,7 @@ export default function SignUp() {
       },
     });
   }
+
   const err = (id) => errors[id];
   const ariaErr = (id) =>
     err(id)
@@ -306,6 +232,7 @@ export default function SignUp() {
           "aria-errormessage": `${id}-error`,
         }
       : {};
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-950 to-slate-900 px-4 py-10">
       {/* Decorative elements */}
@@ -314,6 +241,7 @@ export default function SignUp() {
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl"></div>
         <div className="absolute top-1/4 left-1/4 w-40 h-40 bg-blue-500/5 rounded-full blur-2xl"></div>
       </div>
+
       <motion.div
         className="w-full max-w-3xl"
         initial={{
@@ -354,6 +282,7 @@ export default function SignUp() {
             </span>
           </Link>
         </motion.div>
+
         <motion.div
           className="relative rounded-2xl border border-slate-800/80 bg-slate-900/90 p-8 shadow-xl backdrop-blur-sm"
           initial={{
@@ -371,6 +300,7 @@ export default function SignUp() {
         >
           {/* Glow effect */}
           <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-2xl blur opacity-30 -z-10"></div>
+
           <header className="mb-6 text-center">
             <motion.h1
               className="text-2xl font-extrabold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent"
@@ -403,6 +333,7 @@ export default function SignUp() {
               Join Timely NEP to manage your academic schedule
             </motion.p>
           </header>
+
           {/* Progress indicator */}
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
@@ -410,11 +341,7 @@ export default function SignUp() {
                 Step {currentStep} of {totalSteps}
               </span>
               <span className="text-xs font-medium text-indigo-400">
-                {active === "personal"
-                  ? "Personal Details"
-                  : active === "role"
-                  ? "User Specific"
-                  : "Security"}
+                {active === "personal" ? "Personal Details" : "Security"}
               </span>
             </div>
             <div className="h-1.5 w-full bg-slate-800/50 rounded-full overflow-hidden">
@@ -432,6 +359,7 @@ export default function SignUp() {
               />
             </div>
           </div>
+
           {/* Error alert */}
           <AnimatePresence>
             {formAlert && (
@@ -459,6 +387,7 @@ export default function SignUp() {
               </motion.div>
             )}
           </AnimatePresence>
+
           {/* Tabs */}
           <div
             role="tablist"
@@ -466,7 +395,7 @@ export default function SignUp() {
             className="flex mb-6 border-b border-slate-800"
             onKeyDown={onKeyDownTabs}
           >
-            {TABS.map((tab, index) => {
+            {TABS.map((tab) => {
               const selected = active === tab.id;
               const Icon = tab.icon;
               const isCompleted =
@@ -520,6 +449,7 @@ export default function SignUp() {
               );
             })}
           </div>
+
           <form onSubmit={submit} className="space-y-6" noValidate>
             {/* Personal */}
             <AnimatePresence mode="wait">
@@ -564,6 +494,7 @@ export default function SignUp() {
                       placeholder="User/roll/emp ID"
                       autoComplete="username"
                     />
+
                     <Field
                       id="name"
                       label="Name"
@@ -581,6 +512,7 @@ export default function SignUp() {
                       placeholder="Full name"
                       autoComplete="name"
                     />
+
                     <Field
                       id="email"
                       label="Email"
@@ -599,6 +531,7 @@ export default function SignUp() {
                       placeholder="name@university.edu"
                       autoComplete="username"
                     />
+
                     <Field
                       id="contact"
                       label="Contact"
@@ -617,6 +550,7 @@ export default function SignUp() {
                       placeholder="+91-XXXXXXXXXX"
                       autoComplete="tel"
                     />
+
                     <Field
                       id="universityCode"
                       label="University name/code"
@@ -634,6 +568,7 @@ export default function SignUp() {
                       placeholder="SPPU / UNI123"
                       autoComplete="organization"
                     />
+
                     <Field
                       id="instituteCode"
                       label="Institute name/code"
@@ -652,53 +587,22 @@ export default function SignUp() {
                       autoComplete="organization"
                     />
                   </div>
+
+                  {/* Fixed, non-editable role display */}
                   <div>
-                    <label
-                      htmlFor="role"
-                      className="block text-sm font-medium text-slate-200 mb-1.5"
-                    >
+                    <label className="block text-sm font-medium text-slate-200 mb-1.5">
                       User type
                     </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                        <UserIcon className="h-5 w-5 text-slate-500" />
-                      </div>
-                      <select
-                        id="role"
-                        value={personal.role}
-                        onChange={(e) =>
-                          setPersonal((p) => ({
-                            ...p,
-                            role: e.target.value,
-                          }))
-                        }
-                        className="w-full rounded-xl border border-slate-700 bg-slate-800/50 pl-10 px-3 py-2.5 text-slate-100 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/30 appearance-none transition-all duration-200"
-                      >
-                        <option>Student</option>
-                        <option>Faculty</option>
-                        <option>HOD</option>
-                        <option>Dean</option>
-                      </select>
-                      <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                        <svg
-                          className="h-5 w-5 text-slate-500"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </div>
+                    <div className="w-full rounded-xl border border-slate-700 bg-slate-800/50 px-3 py-2.5 text-slate-100">
+                      Dean
                     </div>
                     <p className="mt-1.5 text-xs text-slate-400">
-                      Complete the next tab based on the selected role.
+                      Signup is restricted to the Dean role.
                     </p>
                   </div>
                 </motion.section>
               )}
+
               {/* Role-specific */}
               {active === "role" && (
                 <motion.section
@@ -724,253 +628,19 @@ export default function SignUp() {
                   }}
                 >
                   <div className="mb-4 inline-flex items-center px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300">
-                    <span className="text-xs font-medium">
-                      Role: {personal.role}
-                    </span>
+                    <span className="text-xs font-medium">Role: Dean</span>
                   </div>
-                  {personal.role === "Student" && (
-                    <motion.div
-                      className="space-y-5"
-                      initial={{
-                        opacity: 0,
-                      }}
-                      animate={{
-                        opacity: 1,
-                      }}
-                      transition={{
-                        delay: 0.2,
-                      }}
-                    >
-                      <SelectField
-                        id="student-dept"
-                        label="Department"
-                        icon={
-                          <BuildingIcon className="h-5 w-5 text-slate-500" />
-                        }
-                        value={student.department}
-                        onChange={(v) => {
-                          setStudent((s) => ({
-                            ...s,
-                            department: v,
-                          }));
-                          clearFieldError("student-dept");
-                        }}
-                        error={err("student-dept")}
-                        options={DEPARTMENTS}
-                      />
-                      <SelectField
-                        id="student-elective"
-                        label="Elective subject"
-                        icon={<BookIcon className="h-5 w-5 text-slate-500" />}
-                        value={student.elective}
-                        onChange={(v) => {
-                          setStudent((s) => ({
-                            ...s,
-                            elective: v,
-                          }));
-                          clearFieldError("student-elective");
-                        }}
-                        error={err("student-elective")}
-                        options={ELECTIVES}
-                      />
-                      <Field
-                        id="student-credits"
-                        label="Total enrolled credits"
-                        type="number"
-                        icon={
-                          <CalendarDaysIcon className="h-5 w-5 text-slate-500" />
-                        }
-                        value={student.totalCredits}
-                        onChange={(v) => {
-                          setStudent((s) => ({
-                            ...s,
-                            totalCredits: v,
-                          }));
-                          clearFieldError("student-credits");
-                        }}
-                        error={err("student-credits")}
-                        ariaProps={ariaErr("student-credits")}
-                        placeholder="e.g., 22"
-                      />
-                    </motion.div>
-                  )}
-                  {personal.role === "Faculty" && (
-                    <motion.div
-                      className="space-y-5"
-                      initial={{
-                        opacity: 0,
-                      }}
-                      animate={{
-                        opacity: 1,
-                      }}
-                      transition={{
-                        delay: 0.2,
-                      }}
-                    >
-                      <SelectField
-                        id="faculty-dept"
-                        label="Department"
-                        icon={
-                          <BuildingIcon className="h-5 w-5 text-slate-500" />
-                        }
-                        value={faculty.department}
-                        onChange={(v) => {
-                          setFaculty((s) => ({
-                            ...s,
-                            department: v,
-                          }));
-                          clearFieldError("faculty-dept");
-                        }}
-                        error={err("faculty-dept")}
-                        options={DEPARTMENTS}
-                      />
-                      <div>
-                        <span className="block text-sm font-medium text-slate-200 mb-1.5">
-                          Subjects / expertise
-                        </span>
-                        <div className="p-4 rounded-xl border border-slate-700 bg-slate-800/30">
-                          <div
-                            className="grid grid-cols-1 sm:grid-cols-2 gap-3"
-                            id="faculty-expertise-group"
-                          >
-                            {FACULTY_SUBJECTS.map((s) => (
-                              <motion.label
-                                key={s}
-                                className="inline-flex items-center gap-2.5 text-sm text-slate-200 p-2 rounded-lg border border-slate-700/50 bg-slate-800/50 hover:bg-slate-800/80 transition-colors cursor-pointer"
-                                whileHover={{
-                                  scale: 1.02,
-                                }}
-                                whileTap={{
-                                  scale: 0.98,
-                                }}
-                              >
-                                <input
-                                  type="checkbox"
-                                  className="rounded border-slate-600 bg-slate-800 text-indigo-500 focus:ring-indigo-400/40 h-4 w-4"
-                                  checked={faculty.expertise.includes(s)}
-                                  onChange={(e) => {
-                                    const checked = e.target.checked;
-                                    setFaculty((prev) => ({
-                                      ...prev,
-                                      expertise: checked
-                                        ? [...prev.expertise, s]
-                                        : prev.expertise.filter((x) => x !== s),
-                                    }));
-                                    clearFieldError("faculty-expertise");
-                                  }}
-                                  aria-describedby={
-                                    err("faculty-expertise")
-                                      ? "faculty-expertise-error"
-                                      : undefined
-                                  }
-                                />
-                                <span>{s}</span>
-                              </motion.label>
-                            ))}
-                          </div>
-                          {err("faculty-expertise") && (
-                            <p
-                              id="faculty-expertise-error"
-                              className="mt-3 text-xs text-red-300 flex items-center gap-1"
-                            >
-                              <span className="inline-block w-1 h-1 bg-red-400 rounded-full"></span>
-                              {err("faculty-expertise")}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                      <Field
-                        id="faculty-availability"
-                        label="Availability"
-                        icon={
-                          <CalendarDaysIcon className="h-5 w-5 text-slate-500" />
-                        }
-                        value={faculty.availability}
-                        onChange={(v) => {
-                          setFaculty((s) => ({
-                            ...s,
-                            availability: v,
-                          }));
-                          clearFieldError("faculty-availability");
-                        }}
-                        error={err("faculty-availability")}
-                        ariaProps={ariaErr("faculty-availability")}
-                        placeholder="Mon–Fri 9–4; no Wed 2–3"
-                      />
-                    </motion.div>
-                  )}
-                  {personal.role === "HOD" && (
-                    <motion.div
-                      className="space-y-5"
-                      initial={{
-                        opacity: 0,
-                      }}
-                      animate={{
-                        opacity: 1,
-                      }}
-                      transition={{
-                        delay: 0.2,
-                      }}
-                    >
-                      <SelectField
-                        id="hod-dept"
-                        label="Department"
-                        icon={
-                          <BuildingIcon className="h-5 w-5 text-slate-500" />
-                        }
-                        value={hod.department}
-                        onChange={(v) => {
-                          setHod((s) => ({
-                            ...s,
-                            department: v,
-                          }));
-                          clearFieldError("hod-dept");
-                        }}
-                        error={err("hod-dept")}
-                        options={DEPARTMENTS}
-                      />
-                      <motion.label
-                        className="inline-flex items-center gap-3 p-3 rounded-xl border border-slate-700/50 bg-slate-800/30 text-sm text-slate-200 cursor-pointer hover:bg-slate-800/50 transition-colors"
-                        whileHover={{
-                          scale: 1.01,
-                        }}
-                        whileTap={{
-                          scale: 0.99,
-                        }}
-                      >
-                        <input
-                          type="checkbox"
-                          className="rounded border-slate-600 bg-slate-800 text-indigo-500 focus:ring-indigo-400/40 h-4 w-4"
-                          checked={hod.approveTimetables}
-                          onChange={(e) =>
-                            setHod((s) => ({
-                              ...s,
-                              approveTimetables: e.target.checked,
-                            }))
-                          }
-                        />
-                        <span>Approve timetables</span>
-                      </motion.label>
-                    </motion.div>
-                  )}
-                  {personal.role === "Dean" && (
-                    <motion.div
-                      className="p-5 rounded-xl border border-slate-700/50 bg-slate-800/30 text-sm text-slate-400 flex items-center justify-center"
-                      initial={{
-                        opacity: 0,
-                      }}
-                      animate={{
-                        opacity: 1,
-                      }}
-                      transition={{
-                        delay: 0.2,
-                      }}
-                    >
-                      <p>No additional details required for Dean.</p>
-                    </motion.div>
-                  )}
+                  <motion.div
+                    className="p-5 rounded-xl border border-slate-700/50 bg-slate-800/30 text-sm text-slate-400 flex items-center justify-center"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    <p>No additional details required for Dean.</p>
+                  </motion.div>
                 </motion.section>
               )}
+
               {/* Password */}
               {active === "password" && (
                 <motion.section
@@ -1017,6 +687,7 @@ export default function SignUp() {
                     error={err("password")}
                     autoComplete="new-password"
                   />
+
                   <PasswordField
                     id="confirmPassword"
                     label="Confirm password"
@@ -1038,6 +709,7 @@ export default function SignUp() {
                     error={err("confirmPassword")}
                     autoComplete="new-password"
                   />
+
                   <div className="mt-2 p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
                     <h3 className="text-sm font-medium text-indigo-300 mb-2 flex items-center gap-2">
                       <CheckCircleIcon className="h-4 w-4" />
@@ -1115,6 +787,7 @@ export default function SignUp() {
                 </motion.section>
               )}
             </AnimatePresence>
+
             <div className="flex items-center justify-between pt-2">
               <div className="flex gap-3">
                 <motion.button
@@ -1132,6 +805,7 @@ export default function SignUp() {
                   <ChevronLeftIcon className="h-4 w-4" />
                   Back
                 </motion.button>
+
                 {active !== "password" && (
                   <motion.button
                     type="button"
@@ -1156,6 +830,7 @@ export default function SignUp() {
                   </motion.button>
                 )}
               </div>
+
               <motion.button
                 type="submit"
                 className="rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 px-6 py-2.5 text-white font-medium shadow-lg shadow-indigo-500/20 hover:shadow-xl hover:shadow-indigo-500/30 hover:from-indigo-600 hover:to-indigo-700 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group"
@@ -1177,6 +852,7 @@ export default function SignUp() {
             </div>
           </form>
         </motion.div>
+
         <motion.p
           className="mt-6 text-center text-sm text-slate-400"
           initial={{
@@ -1202,6 +878,7 @@ export default function SignUp() {
     </div>
   );
 }
+
 function Field({
   id,
   label,
@@ -1259,70 +936,7 @@ function Field({
     </div>
   );
 }
-function SelectField({ id, label, icon, value, onChange, options, error }) {
-  return (
-    <div>
-      <label
-        htmlFor={id}
-        className="block text-sm font-medium text-slate-200 mb-1.5"
-      >
-        {label}
-      </label>
-      <div className="relative">
-        {icon && (
-          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-            {icon}
-          </div>
-        )}
-        <select
-          id={id}
-          name={id}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          required
-          className={`w-full rounded-xl border bg-slate-800/50 ${
-            icon ? "pl-10" : "pl-3"
-          } px-3 py-2.5 text-slate-100 appearance-none focus:ring-2 focus:ring-indigo-400/30 transition-all duration-200 ${
-            error
-              ? "border-red-500/60 focus:border-red-400"
-              : "border-slate-700/50 focus:border-indigo-400"
-          }`}
-          aria-invalid={!!error}
-          aria-errormessage={error ? `${id}-error` : undefined}
-        >
-          <option value="">Select</option>
-          {options.map((o) => (
-            <option key={o} value={o}>
-              {o}
-            </option>
-          ))}
-        </select>
-        <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-          <svg
-            className="h-5 w-5 text-slate-500"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </div>
-      </div>
-      {error && (
-        <p
-          id={`${id}-error`}
-          className="mt-1.5 text-xs text-red-300 flex items-center gap-1"
-        >
-          <span className="inline-block w-1 h-1 bg-red-400 rounded-full"></span>
-          {error}
-        </p>
-      )}
-    </div>
-  );
-}
+
 function PasswordField({
   id,
   label,

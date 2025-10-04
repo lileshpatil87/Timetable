@@ -6,10 +6,28 @@
 @tailwind utilities;
 
 @layer utilities {
-  .scrollbar-hidden::-webkit-scrollbar { display: none; }     /* Chrome/Safari/Edge/Opera */
-  .scrollbar-hidden { scrollbar-width: none; -ms-overflow-style: none; } /* Firefox/IE */
+  .scrollbar-hidden::-webkit-scrollbar {
+    display: none;
+  } /* Chrome/Safari/Edge/Opera */
+  .scrollbar-hidden {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  } /* Firefox/IE */
 }
 
+/* select reset */
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: none;
+  background-color: transparent;
+}
+
+/* optional: hide Edge/IE arrow */
+select::-ms-expand {
+  display: none;
+}
 
 /* :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;

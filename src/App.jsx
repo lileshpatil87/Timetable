@@ -23,6 +23,11 @@ import DeanDashboard from "./pages/DeanDashboard";
 import { DashboardLayout } from "./components/DashboardLayout";
 import ApprovalQueue from "./pages/ApprovalQueue";
 import ReportedClashes from "./pages/ReportedClashes";
+import ViewPrograms from "./pages/ViewPrograms";
+import RegisterHOD from "./pages/RegisterHOD";
+import RegisterFaculty from "./pages/RegisterFaculty";
+import StaffDashboard from "./pages/StaffDashboard";
+import ViewRooms from "./pages/ViewRooms";
 
 function App() {
   return (
@@ -34,20 +39,39 @@ function App() {
         <Route path="/admin" element={<AdminDashboard />}></Route>
         <Route path="/student" element={<StudentDashboard />}></Route>
         <Route path="/faculty" element={<FacultyDashboard />}></Route>
-        <Route element={<DashboardLayout />}>
-          <Route path="/hod" element={<HODDashboard />}></Route>
-          <Route path="/dean" element={<DeanDashboard />}></Route>
-          <Route path="/programs" element={<ProgramsFramework />}></Route>
-          <Route path="/approvals" element={<ApprovalQueue />}></Route>
-          <Route path="/clashes" element={<ReportedClashes />}></Route>
-          <Route path="/courses" element={<CoursesOfferings />}></Route>
-          <Route path="/faculties" element={<FacultyManagement />}></Route>
-          <Route path="/rooms" element={<RoomsResources />}></Route>
-          <Route path="/students" element={<StudentsEnrollments />}></Route>
-          <Route path="/timetables" element={<Timetables />}></Route>
-          <Route path="/conflicts" element={<ConflictExplorer />}></Route>
-          <Route path="/exports" element={<ExportsPublishing />}></Route>
+        <Route path="/staff" element={<StaffDashboard />}></Route>
+
+        <Route path="/dean" element={<DashboardLayout role="dean" />}>
+          <Route index element={<DeanDashboard />} />
+          <Route path="approvals" element={<ApprovalQueue />}></Route>
+          <Route path="clashes" element={<ReportedClashes />}></Route>
+          <Route path="courses" element={<CoursesOfferings />}></Route>
+          <Route path="faculties" element={<FacultyManagement />}></Route>
+          <Route path="students" element={<StudentsEnrollments />}></Route>
+          <Route path="timetables" element={<Timetables />}></Route>
+          <Route path="conflicts" element={<ConflictExplorer />}></Route>
+          <Route path="exports" element={<ExportsPublishing />}></Route>
+          <Route path="view" element={<ViewPrograms />}></Route>
+          <Route path="register" element={<RegisterHOD />}></Route>
+          <Route path="viewr" element={<ViewRooms />}></Route>
         </Route>
+
+        <Route path="/hod" element={<DashboardLayout role="hod" />}>
+          <Route index element={<HODDashboard />} />
+          <Route path="programs" element={<ProgramsFramework />}></Route>
+          <Route path="rooms" element={<RoomsResources />}></Route>
+          <Route path="registerf" element={<RegisterFaculty />}></Route>
+          <Route path="approvals" element={<ApprovalQueue />}></Route>
+          <Route path="clashes" element={<ReportedClashes />}></Route>
+          <Route path="courses" element={<CoursesOfferings />}></Route>
+          <Route path="faculties" element={<FacultyManagement />}></Route>
+          <Route path="students" element={<StudentsEnrollments />}></Route>
+          <Route path="timetables" element={<Timetables />}></Route>
+          <Route path="conflicts" element={<ConflictExplorer />}></Route>
+          <Route path="exports" element={<ExportsPublishing />}></Route>
+          <Route path="viewr" element={<ViewRooms />}></Route>
+        </Route>
+
         <Route path="/calendars" element={<CalendarsConstraints />}></Route>
         <Route path="/scenarios" element={<ScenarioComposer />}></Route>
         <Route

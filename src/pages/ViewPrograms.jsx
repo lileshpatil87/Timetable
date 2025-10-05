@@ -1,19 +1,23 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { useOutletContext } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  SearchIcon,
-  FilterIcon,
-  ClipboardListIcon,
-  AlertTriangleIcon,
+  Search,
+  Filter,
+  ClipboardList,
+  AlertTriangle,
   BookIcon,
-  BookOpenIcon,
-  PuzzleIcon,
-  GraduationCapIcon,
-  UsersIcon,
-  FlaskConicalIcon,
-  BriefcaseIcon,
-  BarChartIcon,
-  ClockIcon,
-  LayoutGridIcon,
+  BookOpen,
+  Puzzle,
+  GraduationCap,
+  Users,
+  FlaskConical,
+  Briefcase,
+  BarChart3,
+  Clock,
+  LayoutGrid,
+  Sparkles,
+  TrendingUp,
 } from "lucide-react";
 
 const CATEGORY_OPTIONS = [
@@ -27,29 +31,17 @@ const CATEGORY_OPTIONS = [
   "Research",
 ];
 
-const CATEGORY_COLORS = {
-  Major: "bg-blue-500/20 text-blue-300 border-blue-400/40",
-  Minor: "bg-violet-500/20 text-violet-300 border-violet-400/40",
-  MDC: "bg-indigo-500/20 text-indigo-300 border-indigo-400/40",
-  AEC: "bg-emerald-500/20 text-emerald-300 border-emerald-400/40",
-  SEC: "bg-amber-500/20 text-amber-300 border-amber-400/40",
-  VAC: "bg-pink-500/20 text-pink-300 border-pink-400/40",
-  Internship: "bg-cyan-500/20 text-cyan-300 border-cyan-400/40",
-  Research: "bg-rose-500/20 text-rose-300 border-rose-400/40",
-};
-
 const CATEGORY_ICONS = {
   Major: <BookIcon size={14} />,
-  Minor: <BookOpenIcon size={14} />,
-  MDC: <PuzzleIcon size={14} />,
-  AEC: <GraduationCapIcon size={14} />,
-  SEC: <UsersIcon size={14} />,
-  VAC: <FlaskConicalIcon size={14} />,
-  Internship: <BriefcaseIcon size={14} />,
-  Research: <BarChartIcon size={14} />,
+  Minor: <BookOpen size={14} />,
+  MDC: <Puzzle size={14} />,
+  AEC: <GraduationCap size={14} />,
+  SEC: <Users size={14} />,
+  VAC: <FlaskConical size={14} />,
+  Internship: <Briefcase size={14} />,
+  Research: <BarChart3 size={14} />,
 };
 
-// Sample seed programs (could be replaced with API fetch)
 const SEED_PROGRAMS = [
   {
     code: "EDU201",
@@ -108,7 +100,6 @@ const SEED_PROGRAMS = [
   },
 ];
 
-// Load persisted filters or default
 function loadFilters() {
   const f = localStorage.getItem("programFilters");
   return f
@@ -123,15 +114,72 @@ function loadFilters() {
 }
 
 export default function ViewPrograms() {
+  // Get theme from parent layout
+  const outletContext = useOutletContext();
+  const { theme: contextTheme, isDark: contextIsDark } = outletContext || {};
+
+  const [localIsDark] = useState(false);
+  const isDark = contextIsDark !== undefined ? contextIsDark : localIsDark;
+
+  const defaultTheme = {
+    bg: isDark ? "bg-slate-950" : "bg-gray-50",
+    text: isDark ? "text-slate-50" : "text-gray-900",
+    cardBg: isDark ? "bg-slate-900/50" : "bg-white",
+    cardBorder: isDark ? "border-slate-800/60" : "border-gray-200",
+    mutedText: isDark ? "text-slate-400" : "text-gray-600",
+    gradient: isDark
+      ? "from-indigo-400 via-purple-400 to-pink-400"
+      : "from-indigo-600 via-purple-600 to-pink-600",
+    accentBg: isDark ? "bg-slate-800/30" : "bg-gray-50",
+    accentBorder: isDark ? "border-slate-700/40" : "border-gray-200",
+    hoverBg: isDark ? "hover:bg-slate-800/50" : "hover:bg-gray-50",
+    inputBg: isDark ? "bg-slate-800/50" : "bg-white",
+    inputBorder: isDark ? "border-slate-700" : "border-gray-300",
+    inputText: isDark ? "text-slate-100" : "text-gray-900",
+    tableBorder: isDark ? "border-slate-800/60" : "border-gray-200",
+    tableHeader: isDark ? "bg-slate-800/40" : "bg-gray-50",
+  };
+
+  const theme = contextTheme || defaultTheme;
+
+  // Category colors with theme support
+  const getCategoryColor = (category) => {
+    const colors = {
+      Major: isDark
+        ? "bg-blue-500/20 text-blue-300 border-blue-400/40"
+        : "bg-blue-100 text-blue-700 border-blue-200",
+      Minor: isDark
+        ? "bg-violet-500/20 text-violet-300 border-violet-400/40"
+        : "bg-violet-100 text-violet-700 border-violet-200",
+      MDC: isDark
+        ? "bg-indigo-500/20 text-indigo-300 border-indigo-400/40"
+        : "bg-indigo-100 text-indigo-700 border-indigo-200",
+      AEC: isDark
+        ? "bg-emerald-500/20 text-emerald-300 border-emerald-400/40"
+        : "bg-emerald-100 text-emerald-700 border-emerald-200",
+      SEC: isDark
+        ? "bg-amber-500/20 text-amber-300 border-amber-400/40"
+        : "bg-amber-100 text-amber-700 border-amber-200",
+      VAC: isDark
+        ? "bg-pink-500/20 text-pink-300 border-pink-400/40"
+        : "bg-pink-100 text-pink-700 border-pink-200",
+      Internship: isDark
+        ? "bg-cyan-500/20 text-cyan-300 border-cyan-400/40"
+        : "bg-cyan-100 text-cyan-700 border-cyan-200",
+      Research: isDark
+        ? "bg-rose-500/20 text-rose-300 border-rose-400/40"
+        : "bg-rose-100 text-rose-700 border-rose-200",
+    };
+    return colors[category] || "";
+  };
+
   const [programs] = useState(SEED_PROGRAMS);
   const [filters, setFilters] = useState(loadFilters());
 
-  // Persist filters
   useEffect(() => {
     localStorage.setItem("programFilters", JSON.stringify(filters));
   }, [filters]);
 
-  // Filter programs on dependencies
   const filtered = useMemo(() => {
     return programs.filter((p) => {
       const q = filters.q.trim().toLowerCase();
@@ -151,218 +199,347 @@ export default function ViewPrograms() {
     });
   }, [programs, filters]);
 
+  // Statistics
+  const stats = useMemo(() => {
+    return {
+      total: programs.length,
+      filtered: filtered.length,
+      withLab: filtered.filter((p) => p.lab).length,
+      avgCredits:
+        filtered.length > 0
+          ? (
+              filtered.reduce((sum, p) => sum + p.credits, 0) / filtered.length
+            ).toFixed(1)
+          : 0,
+    };
+  }, [programs, filtered]);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 to-slate-900 text-slate-100">
-      <div className="max-w-[1280px] mx-auto px-6">
-        <h1 className="text-3xl font-extrabold mb-3 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-          View Programs
-        </h1>
-        <p className="text-slate-400 mb-6">
-          Browse all academic programs with filtering options.
-        </p>
-
-        {/* Filters */}
-        <section
-          className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 shadow-lg backdrop-blur-sm mb-8"
-          aria-labelledby="filters-title"
-        >
-          <h2
-            id="filters-title"
-            className="text-base font-bold mb-4 flex items-center gap-2"
+    <div className="space-y-8">
+      {/* Page Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="flex items-start gap-4 mb-4">
+          <div
+            className={`p-3 rounded-xl ${
+              isDark ? "bg-indigo-100" : "bg-indigo-500/20"
+            }`}
           >
-            <FilterIcon size={18} className="text-indigo-400" />
-            Filter Programs
+            <Sparkles
+              size={24}
+              className={isDark ? "text-indigo-600" : "text-indigo-400"}
+            />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold mb-2">View Programs</h1>
+            <p className={`text-sm ${theme.mutedText}`}>
+              Browse all academic programs with filtering options
+            </p>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          {
+            label: "Total Programs",
+            value: stats.total,
+            icon: <ClipboardList size={18} />,
+            color: isDark ? "bg-indigo-500/20" : "bg-indigo-100",
+            iconColor: isDark ? "text-indigo-400" : "text-indigo-600",
+          },
+          {
+            label: "Filtered Results",
+            value: stats.filtered,
+            icon: <Filter size={18} />,
+            color: isDark ? "bg-emerald-500/20" : "bg-emerald-100",
+            iconColor: isDark ? "text-emerald-400" : "text-emerald-600",
+          },
+          {
+            label: "With Lab",
+            value: stats.withLab,
+            icon: <FlaskConical size={18} />,
+            color: isDark ? "bg-purple-500/20" : "bg-purple-100",
+            iconColor: isDark ? "text-purple-400" : "text-purple-600",
+          },
+          {
+            label: "Avg Credits",
+            value: stats.avgCredits,
+            icon: <TrendingUp size={18} />,
+            color: isDark ? "bg-amber-500/20" : "bg-amber-100",
+            iconColor: isDark ? "text-amber-400" : "text-amber-600",
+          },
+        ].map((stat, idx) => (
+          <motion.div
+            key={idx}
+            className={`rounded-xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm p-5 shadow-sm`}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: idx * 0.05 }}
+          >
+            <div className="flex items-start justify-between mb-3">
+              <div className={`p-2.5 rounded-lg ${stat.color}`}>
+                <div className={stat.iconColor}>{stat.icon}</div>
+              </div>
+            </div>
+            <div className="space-y-1">
+              <p className={`text-xs ${theme.mutedText}`}>{stat.label}</p>
+              <p className="text-2xl font-bold">{stat.value}</p>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Filters */}
+      <motion.section
+        className={`rounded-2xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm p-6 shadow-sm`}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+      >
+        <h2 className="text-base font-bold mb-5 flex items-center gap-2">
+          <Filter
+            size={18}
+            className={isDark ? "text-indigo-600" : "text-indigo-400"}
+          />
+          Filter Programs
+        </h2>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          {/* Search */}
+          <div className="relative">
+            <Search
+              size={16}
+              className={`absolute left-3 top-1/2 -translate-y-1/2 ${theme.mutedText}`}
+            />
+            <input
+              type="search"
+              placeholder="Search code/title"
+              value={filters.q}
+              onChange={(e) => setFilters((f) => ({ ...f, q: e.target.value }))}
+              className={`w-full pl-10 pr-4 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
+            />
+          </div>
+
+          {/* Category */}
+          <div className="relative">
+            <select
+              value={filters.cat}
+              onChange={(e) =>
+                setFilters((f) => ({ ...f, cat: e.target.value }))
+              }
+              className={`w-full appearance-none pl-4 pr-10 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
+            >
+              <option>All</option>
+              {CATEGORY_OPTIONS.map((o) => (
+                <option key={o}>{o}</option>
+              ))}
+            </select>
+            <LayoutGrid
+              size={16}
+              className={`absolute right-3 top-1/2 -translate-y-1/2 ${theme.mutedText} pointer-events-none`}
+            />
+          </div>
+
+          {/* Min Credits */}
+          <input
+            type="number"
+            placeholder="Min credits"
+            value={filters.minCr}
+            onChange={(e) =>
+              setFilters((f) => ({ ...f, minCr: e.target.value }))
+            }
+            className={`w-full px-4 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
+          />
+
+          {/* Max Credits */}
+          <input
+            type="number"
+            placeholder="Max credits"
+            value={filters.maxCr}
+            onChange={(e) =>
+              setFilters((f) => ({ ...f, maxCr: e.target.value }))
+            }
+            className={`w-full px-4 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
+          />
+
+          {/* Has Lab */}
+          <div className="relative">
+            <select
+              value={filters.hasLab}
+              onChange={(e) =>
+                setFilters((f) => ({ ...f, hasLab: e.target.value }))
+              }
+              className={`w-full appearance-none pl-4 pr-10 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
+            >
+              <option>All</option>
+              <option>Yes</option>
+              <option>No</option>
+            </select>
+            <FlaskConical
+              size={16}
+              className={`absolute right-3 top-1/2 -translate-y-1/2 ${theme.mutedText} pointer-events-none`}
+            />
+          </div>
+        </div>
+      </motion.section>
+
+      {/* Programs Table */}
+      <motion.section
+        className={`rounded-2xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm overflow-hidden shadow-sm`}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+      >
+        <div className={`p-5 border-b ${theme.cardBorder}`}>
+          <h2 className="text-base font-bold flex items-center gap-2">
+            <ClipboardList
+              size={18}
+              className={isDark ? "text-indigo-600" : "text-indigo-400"}
+            />
+            All Programs
+            <span
+              className={`px-2.5 py-1 text-xs rounded-lg font-semibold ${theme.accentBg} border ${theme.accentBorder}`}
+            >
+              {filtered.length} programs
+            </span>
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-500">
-                <SearchIcon size={16} />
-              </div>
-              <input
-                type="search"
-                placeholder="Search code/title"
-                value={filters.q}
-                onChange={(e) =>
-                  setFilters((f) => ({ ...f, q: e.target.value }))
-                }
-                className="w-full rounded-lg border border-slate-700 bg-slate-800/70 pl-10 pr-4 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-              />
-            </div>
+        </div>
 
-            <div className="relative">
-              <select
-                value={filters.cat}
-                onChange={(e) =>
-                  setFilters((f) => ({ ...f, cat: e.target.value }))
-                }
-                className="w-full appearance-none rounded-lg border border-slate-700 bg-slate-800/70 pl-4 pr-10 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-              >
-                <option>All</option>
-                {CATEGORY_OPTIONS.map((o) => (
-                  <option key={o}>{o}</option>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead className={theme.tableHeader}>
+              <tr>
+                {[
+                  "Code",
+                  "Title",
+                  "Category",
+                  "Credits",
+                  "L–T–P",
+                  "Duration",
+                  "Lab",
+                ].map((header) => (
+                  <th
+                    key={header}
+                    className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b ${theme.tableBorder}`}
+                  >
+                    {header}
+                  </th>
                 ))}
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
-                <LayoutGridIcon size={16} />
-              </div>
-            </div>
-
-            <input
-              type="number"
-              className="w-full rounded-lg border border-slate-700 bg-slate-800/70 px-4 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-              placeholder="Min credits"
-              value={filters.minCr}
-              onChange={(e) =>
-                setFilters((f) => ({ ...f, minCr: e.target.value }))
-              }
-            />
-
-            <input
-              type="number"
-              className="w-full rounded-lg border border-slate-700 bg-slate-800/70 px-4 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-              placeholder="Max credits"
-              value={filters.maxCr}
-              onChange={(e) =>
-                setFilters((f) => ({ ...f, maxCr: e.target.value }))
-              }
-            />
-
-            <div className="relative">
-              <select
-                value={filters.hasLab}
-                onChange={(e) =>
-                  setFilters((f) => ({ ...f, hasLab: e.target.value }))
-                }
-                className="w-full appearance-none rounded-lg border border-slate-700 bg-slate-800/70 pl-4 pr-10 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-              >
-                <option>All</option>
-                <option>Yes</option>
-                <option>No</option>
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
-                <FlaskConicalIcon size={16} />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Program List */}
-        <section
-          className="rounded-xl border border-slate-800 bg-slate-900/60 overflow-hidden shadow-lg backdrop-blur-sm"
-          aria-label="Programs list"
-        >
-          <div className="p-5 border-b border-slate-800">
-            <h2 className="text-base font-bold flex items-center gap-2">
-              <ClipboardListIcon size={18} className="text-indigo-400" />
-              All Programs
-              <span className="ml-2 px-2 py-0.5 text-xs rounded-full bg-slate-800 text-slate-300">
-                {filtered.length} programs
-              </span>
-            </h2>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-left text-sm">
-              <caption className="sr-only">List of academic programs</caption>
-              <thead className="text-slate-300 bg-slate-800/50">
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.length === 0 ? (
                 <tr>
-                  {[
-                    "Code",
-                    "Title",
-                    "Category",
-                    "Credits",
-                    "L–T–P",
-                    "Duration",
-                    "Lab",
-                  ].map((header) => (
-                    <th
-                      key={header}
-                      scope="col"
-                      className="px-4 py-3 uppercase tracking-wider font-semibold"
-                    >
-                      {header}
-                    </th>
-                  ))}
+                  <td
+                    colSpan={7}
+                    className={`px-4 py-12 text-center ${theme.mutedText}`}
+                  >
+                    <div className="flex flex-col items-center gap-3">
+                      <AlertTriangle size={32} className="opacity-50" />
+                      <p className="text-sm">
+                        No programs match the current filters
+                      </p>
+                    </div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800">
-                {filtered.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={7}
-                      className="px-4 py-8 text-center text-slate-400"
-                    >
-                      <div className="flex flex-col items-center justify-center gap-2">
-                        <AlertTriangleIcon
-                          size={24}
-                          className="text-slate-500"
-                        />
-                        <p>No programs match the current filters.</p>
+              ) : (
+                filtered.map((p, idx) => (
+                  <motion.tr
+                    key={p.code}
+                    className={`border-b ${theme.tableBorder} ${theme.hoverBg} transition-colors`}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: idx * 0.03 }}
+                  >
+                    <td className="px-4 py-4 font-mono font-semibold">
+                      {p.code}
+                    </td>
+                    <td className="px-4 py-4">{p.title}</td>
+                    <td className="px-4 py-4">
+                      <span
+                        className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium ${getCategoryColor(
+                          p.category
+                        )}`}
+                      >
+                        {CATEGORY_ICONS[p.category]} {p.category}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4 text-center font-mono font-semibold">
+                      {p.credits}
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="flex items-center gap-1.5">
+                        {p.l > 0 && (
+                          <span
+                            className={`flex items-center justify-center w-7 h-7 rounded-lg text-xs font-semibold ${
+                              isDark
+                                ? "bg-blue-500/20 text-blue-300"
+                                : "bg-blue-100 text-blue-700"
+                            }`}
+                          >
+                            {p.l}L
+                          </span>
+                        )}
+                        {p.t > 0 && (
+                          <span
+                            className={`flex items-center justify-center w-7 h-7 rounded-lg text-xs font-semibold ${
+                              isDark
+                                ? "bg-purple-500/20 text-purple-300"
+                                : "bg-purple-100 text-purple-700"
+                            }`}
+                          >
+                            {p.t}T
+                          </span>
+                        )}
+                        {p.p > 0 && (
+                          <span
+                            className={`flex items-center justify-center w-7 h-7 rounded-lg text-xs font-semibold ${
+                              isDark
+                                ? "bg-emerald-500/20 text-emerald-300"
+                                : "bg-emerald-100 text-emerald-700"
+                            }`}
+                          >
+                            {p.p}P
+                          </span>
+                        )}
                       </div>
                     </td>
-                  </tr>
-                ) : (
-                  filtered.map((p) => (
-                    <tr
-                      key={p.code}
-                      className="hover:bg-slate-800/40 transition-colors cursor-default"
-                    >
-                      <td className="px-4 py-3 font-mono font-semibold">
-                        {p.code}
-                      </td>
-                      <td className="px-4 py-3">{p.title}</td>
-                      <td className="px-4 py-3">
+                    <td className="px-4 py-4">
+                      <span
+                        className={`flex items-center gap-1.5 text-sm ${theme.mutedText}`}
+                      >
+                        <Clock size={14} />
+                        {p.duration} min
+                      </span>
+                    </td>
+                    <td className="px-4 py-4 text-center">
+                      {p.lab ? (
                         <span
-                          className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium ${
-                            CATEGORY_COLORS[p.category] || ""
+                          className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium ${
+                            isDark
+                              ? "bg-emerald-500/20 text-emerald-300 border-emerald-400/40"
+                              : "bg-emerald-100 text-emerald-700 border-emerald-200"
                           }`}
                         >
-                          {CATEGORY_ICONS[p.category]} {p.category}
+                          <FlaskConical size={14} />
+                          Lab
                         </span>
-                      </td>
-                      <td className="px-4 py-3 text-center font-mono font-semibold">
-                        {p.credits}
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-1.5">
-                          {p.l > 0 && (
-                            <span className="flex items-center justify-center w-6 h-6 rounded bg-blue-900/30 text-blue-300 text-xs font-medium">
-                              {p.l}L
-                            </span>
-                          )}
-                          {p.t > 0 && (
-                            <span className="flex items-center justify-center w-6 h-6 rounded bg-purple-900/30 text-purple-300 text-xs font-medium">
-                              {p.t}T
-                            </span>
-                          )}
-                          {p.p > 0 && (
-                            <span className="flex items-center justify-center w-6 h-6 rounded bg-emerald-900/30 text-emerald-300 text-xs font-medium">
-                              {p.p}P
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 flex items-center gap-1 text-slate-400">
-                        <ClockIcon size={14} />
-                        {p.duration} min
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        {p.lab ? (
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 px-2.5 py-1 text-xs font-medium">
-                            <FlaskConicalIcon size={14} />
-                            Lab
-                          </span>
-                        ) : (
-                          "—"
-                        )}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </div>
+                      ) : (
+                        <span className={theme.mutedText}>—</span>
+                      )}
+                    </td>
+                  </motion.tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </motion.section>
     </div>
   );
 }

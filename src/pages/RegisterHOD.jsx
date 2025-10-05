@@ -1,18 +1,19 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  UserIcon,
-  AtSignIcon,
-  PhoneIcon,
-  BuildingIcon,
-  LockIcon,
-  EyeIcon,
-  EyeOffIcon,
-  CheckCircleIcon,
-  ArrowLeftIcon,
-  SaveIcon,
-  ShieldCheckIcon,
+  User,
+  AtSign,
+  Phone,
+  Building2,
+  Lock,
+  Eye,
+  EyeOff,
+  CheckCircle,
+  ArrowLeft,
+  Save,
+  ShieldCheck,
+  Sparkles,
 } from "lucide-react";
 
 const DEPARTMENTS = [
@@ -27,7 +28,31 @@ const DEPARTMENTS = [
 export default function RegisterHOD() {
   const navigate = useNavigate();
 
-  // Form state
+  // Get theme from parent layout
+  const outletContext = useOutletContext();
+  const { theme: contextTheme, isDark: contextIsDark } = outletContext || {};
+
+  const [localIsDark] = useState(false);
+  const isDark = contextIsDark !== undefined ? contextIsDark : localIsDark;
+
+  const defaultTheme = {
+    bg: isDark ? "bg-slate-950" : "bg-gray-50",
+    text: isDark ? "text-slate-50" : "text-gray-900",
+    cardBg: isDark ? "bg-slate-900/50" : "bg-white",
+    cardBorder: isDark ? "border-slate-800/60" : "border-gray-200",
+    mutedText: isDark ? "text-slate-400" : "text-gray-600",
+    gradient: isDark
+      ? "from-indigo-400 via-purple-400 to-pink-400"
+      : "from-indigo-600 via-purple-600 to-pink-600",
+    accentBg: isDark ? "bg-slate-800/30" : "bg-gray-50",
+    accentBorder: isDark ? "border-slate-700/40" : "border-gray-200",
+    inputBg: isDark ? "bg-slate-800/50" : "bg-white",
+    inputBorder: isDark ? "border-slate-700" : "border-gray-300",
+    inputText: isDark ? "text-slate-100" : "text-gray-900",
+  };
+
+  const theme = contextTheme || defaultTheme;
+
   const [form, setForm] = useState({
     id: "",
     name: "",
@@ -44,7 +69,6 @@ export default function RegisterHOD() {
   const [errors, setErrors] = useState({});
   const [formAlert, setFormAlert] = useState("");
 
-  // Field handlers
   const onChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
     clearError(field);
@@ -58,7 +82,6 @@ export default function RegisterHOD() {
     });
   };
 
-  // Validation
   const validate = () => {
     const newErrors = {};
     let ok = true;
@@ -100,7 +123,6 @@ export default function RegisterHOD() {
     return ok;
   };
 
-  // Submit handler
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validate()) return;
@@ -116,10 +138,8 @@ export default function RegisterHOD() {
       role: "HOD",
     };
 
-    // TODO: Replace with actual API call
     console.log("Registering HOD:", payload);
 
-    // Navigate back or show success
     navigate("/dean/dashboard", {
       state: { message: "HOD registered successfully" },
     });
@@ -136,318 +156,329 @@ export default function RegisterHOD() {
     form.password === form.confirmPassword;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-950 to-slate-900 px-4 ">
-      {/* Decorative elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/4 left-1/4 w-40 h-40 bg-blue-500/5 rounded-full blur-2xl"></div>
-      </div>
-
+    <div className="space-y-8">
+      {/* Page Header */}
       <motion.div
-        className="w-full max-w-3xl"
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <motion.div
-          className="relative rounded-2xl border border-slate-800/80 bg-slate-900/90 p-8 shadow-xl backdrop-blur-sm"
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-        >
-          {/* Glow effect */}
-          <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-2xl blur opacity-30 -z-10"></div>
-
-          {/* Header */}
-          <header className="mb-6">
-            <div className="flex items-center justify-between mb-3">
-              <motion.button
-                type="button"
-                onClick={() => navigate(-1)}
-                className="inline-flex items-center gap-2 text-slate-400 hover:text-indigo-300 transition-colors"
-                whileHover={{ x: -4 }}
-              >
-                <ArrowLeftIcon size={18} />
-                <span className="text-sm">Back</span>
-              </motion.button>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300">
-                <ShieldCheckIcon size={14} />
-                <span className="text-xs font-medium">Dean Access</span>
-              </div>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-start gap-4">
+            <div
+              className={`p-3 rounded-xl ${
+                isDark ? "bg-indigo-100" : "bg-indigo-500/20"
+              }`}
+            >
+              <Sparkles
+                size={24}
+                className={isDark ? "text-indigo-600" : "text-indigo-400"}
+              />
             </div>
-            <motion.h1
-              className="text-2xl font-extrabold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent"
+            <div>
+              <h1 className="text-3xl font-bold mb-2">Register HOD</h1>
+              <p className={`text-sm ${theme.mutedText}`}>
+                Create a new Head of Department account with login credentials
+              </p>
+            </div>
+          </div>
+          <div
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border ${theme.accentBorder} ${theme.accentBg}`}
+          >
+            <ShieldCheck
+              size={16}
+              className={isDark ? "text-indigo-600" : "text-indigo-400"}
+            />
+            <span className="text-xs font-medium">Dean Access</span>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Form Card */}
+      <motion.div
+        className={`rounded-2xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm p-8 shadow-sm`}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+      >
+        {/* Alert */}
+        <AnimatePresence>
+          {formAlert && (
+            <motion.div
+              role="alert"
+              aria-live="assertive"
+              className={`px-4 py-3 rounded-xl mb-6 text-sm border ${
+                isDark
+                  ? "bg-red-500/10 border-red-500/30 text-red-300"
+                  : "bg-red-50 border-red-200 text-red-700"
+              }`}
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
             >
-              Register HOD
-            </motion.h1>
-            <motion.p
-              className="text-slate-400 text-sm mt-1"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-            >
-              Create a new Head of Department account with login credentials
-            </motion.p>
-          </header>
+              {formAlert}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-          {/* Alert */}
-          <AnimatePresence>
-            {formAlert && (
-              <motion.div
-                role="alert"
-                aria-live="assertive"
-                className="bg-red-500/10 border border-red-500/30 text-red-300 px-4 py-3 rounded-xl mb-6 text-sm"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                {formAlert}
-              </motion.div>
-            )}
-          </AnimatePresence>
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-8" noValidate>
+          {/* Personal Details */}
+          <section>
+            <h2 className="text-sm font-semibold mb-4 flex items-center gap-2">
+              <User
+                size={16}
+                className={isDark ? "text-indigo-600" : "text-indigo-400"}
+              />
+              Personal Details
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <Field
+                id="id"
+                label="Employee ID"
+                icon={<User className="h-5 w-5" />}
+                value={form.id}
+                onChange={(v) => onChange("id", v)}
+                error={errors.id}
+                placeholder="e.g., HOD001"
+                autoComplete="username"
+                theme={theme}
+                isDark={isDark}
+              />
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6" noValidate>
-            {/* Personal Details */}
-            <section>
-              <h2 className="text-sm font-semibold text-slate-300 mb-4 flex items-center gap-2">
-                <UserIcon size={16} className="text-indigo-400" />
-                Personal Details
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <Field
-                  id="id"
-                  label="Employee ID"
-                  icon={<UserIcon className="h-5 w-5 text-slate-500" />}
-                  value={form.id}
-                  onChange={(v) => onChange("id", v)}
-                  error={errors.id}
-                  placeholder="e.g., HOD001"
-                  autoComplete="username"
-                />
+              <Field
+                id="name"
+                label="Full Name"
+                icon={<User className="h-5 w-5" />}
+                value={form.name}
+                onChange={(v) => onChange("name", v)}
+                error={errors.name}
+                placeholder="Dr. John Doe"
+                autoComplete="name"
+                theme={theme}
+                isDark={isDark}
+              />
 
-                <Field
-                  id="name"
-                  label="Full Name"
-                  icon={<UserIcon className="h-5 w-5 text-slate-500" />}
-                  value={form.name}
-                  onChange={(v) => onChange("name", v)}
-                  error={errors.name}
-                  placeholder="Dr. John Doe"
-                  autoComplete="name"
-                />
+              <Field
+                id="email"
+                label="Email"
+                type="email"
+                icon={<AtSign className="h-5 w-5" />}
+                value={form.email}
+                onChange={(v) => onChange("email", v)}
+                error={errors.email}
+                placeholder="hod@university.edu"
+                autoComplete="email"
+                theme={theme}
+                isDark={isDark}
+              />
 
-                <Field
-                  id="email"
-                  label="Email"
-                  type="email"
-                  icon={<AtSignIcon className="h-5 w-5 text-slate-500" />}
-                  value={form.email}
-                  onChange={(v) => onChange("email", v)}
-                  error={errors.email}
-                  placeholder="hod@university.edu"
-                  autoComplete="email"
-                />
-
-                <Field
-                  id="contact"
-                  label="Contact Number"
-                  type="tel"
-                  icon={<PhoneIcon className="h-5 w-5 text-slate-500" />}
-                  value={form.contact}
-                  onChange={(v) => onChange("contact", v)}
-                  error={errors.contact}
-                  placeholder="+91-XXXXXXXXXX"
-                  autoComplete="tel"
-                />
-              </div>
-            </section>
-
-            {/* Department & Permissions */}
-            <section>
-              <h2 className="text-sm font-semibold text-slate-300 mb-4 flex items-center gap-2">
-                <BuildingIcon size={16} className="text-indigo-400" />
-                Department & Permissions
-              </h2>
-              <div className="space-y-5">
-                <SelectField
-                  id="department"
-                  label="Department"
-                  icon={<BuildingIcon className="h-5 w-5 text-slate-500" />}
-                  value={form.department}
-                  onChange={(v) => onChange("department", v)}
-                  options={DEPARTMENTS}
-                  error={errors.department}
-                />
-
-                <motion.label
-                  className="inline-flex items-center gap-3 p-4 rounded-xl border border-slate-700/50 bg-slate-800/30 text-sm text-slate-200 cursor-pointer hover:bg-slate-800/50 transition-colors"
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.99 }}
-                >
-                  <input
-                    type="checkbox"
-                    className="rounded border-slate-600 bg-slate-800 text-indigo-500 focus:ring-indigo-400/40 h-4 w-4"
-                    checked={form.approveTimetables}
-                    onChange={(e) =>
-                      onChange("approveTimetables", e.target.checked)
-                    }
-                  />
-                  <div>
-                    <div className="font-medium">Approve Timetables</div>
-                    <div className="text-xs text-slate-400 mt-0.5">
-                      Allow this HOD to review and approve department timetables
-                    </div>
-                  </div>
-                </motion.label>
-              </div>
-            </section>
-
-            {/* Login Credentials */}
-            <section>
-              <h2 className="text-sm font-semibold text-slate-300 mb-4 flex items-center gap-2">
-                <LockIcon size={16} className="text-indigo-400" />
-                Login Credentials
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <PasswordField
-                  id="password"
-                  label="Password"
-                  value={form.password}
-                  onChange={(v) => onChange("password", v)}
-                  shown={showPassword}
-                  toggle={() => setShowPassword(!showPassword)}
-                  error={errors.password}
-                  hint="Minimum 8 characters"
-                  autoComplete="new-password"
-                />
-
-                <PasswordField
-                  id="confirmPassword"
-                  label="Confirm Password"
-                  value={form.confirmPassword}
-                  onChange={(v) => onChange("confirmPassword", v)}
-                  shown={showConfirm}
-                  toggle={() => setShowConfirm(!showConfirm)}
-                  error={errors.confirmPassword}
-                  autoComplete="new-password"
-                />
-              </div>
-
-              {/* Password requirements */}
-              <div className="mt-4 p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
-                <h3 className="text-sm font-medium text-indigo-300 mb-2 flex items-center gap-2">
-                  <CheckCircleIcon className="h-4 w-4" />
-                  Password Requirements
-                </h3>
-                <ul className="space-y-1 text-xs text-slate-300">
-                  <li
-                    className={`flex items-center gap-1.5 ${
-                      form.password.length >= 8
-                        ? "text-green-400"
-                        : "text-slate-400"
-                    }`}
-                  >
-                    <div
-                      className={`w-1.5 h-1.5 rounded-full ${
-                        form.password.length >= 8
-                          ? "bg-green-400"
-                          : "bg-slate-600"
-                      }`}
-                    ></div>
-                    Minimum 8 characters
-                  </li>
-                  <li
-                    className={`flex items-center gap-1.5 ${
-                      /[A-Z]/.test(form.password)
-                        ? "text-green-400"
-                        : "text-slate-400"
-                    }`}
-                  >
-                    <div
-                      className={`w-1.5 h-1.5 rounded-full ${
-                        /[A-Z]/.test(form.password)
-                          ? "bg-green-400"
-                          : "bg-slate-600"
-                      }`}
-                    ></div>
-                    At least one uppercase letter
-                  </li>
-                  <li
-                    className={`flex items-center gap-1.5 ${
-                      /[0-9]/.test(form.password)
-                        ? "text-green-400"
-                        : "text-slate-400"
-                    }`}
-                  >
-                    <div
-                      className={`w-1.5 h-1.5 rounded-full ${
-                        /[0-9]/.test(form.password)
-                          ? "bg-green-400"
-                          : "bg-slate-600"
-                      }`}
-                    ></div>
-                    At least one number
-                  </li>
-                  <li
-                    className={`flex items-center gap-1.5 ${
-                      form.password === form.confirmPassword &&
-                      form.password !== ""
-                        ? "text-green-400"
-                        : "text-slate-400"
-                    }`}
-                  >
-                    <div
-                      className={`w-1.5 h-1.5 rounded-full ${
-                        form.password === form.confirmPassword &&
-                        form.password !== ""
-                          ? "bg-green-400"
-                          : "bg-slate-600"
-                      }`}
-                    ></div>
-                    Passwords match
-                  </li>
-                </ul>
-              </div>
-            </section>
-
-            {/* Actions */}
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
-              <motion.button
-                type="button"
-                onClick={() => navigate(-1)}
-                className="rounded-xl border border-slate-700/80 px-5 py-2.5 text-slate-200 hover:border-indigo-400/70 hover:bg-slate-800/50 transition-colors duration-200"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                Cancel
-              </motion.button>
-
-              <motion.button
-                type="submit"
-                className="rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 px-6 py-2.5 text-white font-medium shadow-lg shadow-indigo-500/20 hover:shadow-xl hover:shadow-indigo-500/30 hover:from-indigo-600 hover:to-indigo-700 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group flex items-center gap-2"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                disabled={!isFormComplete}
-              >
-                <SaveIcon size={18} />
-                <span className="relative z-10">Register HOD</span>
-                <span className="absolute inset-0 h-full w-full scale-0 rounded-xl transition-all duration-300 group-hover:scale-100 group-hover:bg-white/10"></span>
-              </motion.button>
+              <Field
+                id="contact"
+                label="Contact Number"
+                type="tel"
+                icon={<Phone className="h-5 w-5" />}
+                value={form.contact}
+                onChange={(v) => onChange("contact", v)}
+                error={errors.contact}
+                placeholder="+91-XXXXXXXXXX"
+                autoComplete="tel"
+                theme={theme}
+                isDark={isDark}
+              />
             </div>
-          </form>
-        </motion.div>
+          </section>
+
+          {/* Department & Permissions */}
+          <section>
+            <h2 className="text-sm font-semibold mb-4 flex items-center gap-2">
+              <Building2
+                size={16}
+                className={isDark ? "text-indigo-600" : "text-indigo-400"}
+              />
+              Department & Permissions
+            </h2>
+            <div className="space-y-5">
+              <SelectField
+                id="department"
+                label="Department"
+                icon={<Building2 className="h-5 w-5" />}
+                value={form.department}
+                onChange={(v) => onChange("department", v)}
+                options={DEPARTMENTS}
+                error={errors.department}
+                theme={theme}
+                isDark={isDark}
+              />
+
+              <motion.label
+                className={`inline-flex items-center gap-3 p-4 rounded-xl border ${theme.cardBorder} ${theme.accentBg} text-sm cursor-pointer ${theme.hoverBg} transition-colors`}
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
+              >
+                <input
+                  type="checkbox"
+                  className={`rounded h-4 w-4 ${
+                    isDark
+                      ? "border-slate-600 bg-slate-800 text-indigo-500 focus:ring-indigo-400/40"
+                      : "border-gray-300 bg-white text-indigo-600 focus:ring-indigo-500"
+                  }`}
+                  checked={form.approveTimetables}
+                  onChange={(e) =>
+                    onChange("approveTimetables", e.target.checked)
+                  }
+                />
+                <div>
+                  <div className="font-medium">Approve Timetables</div>
+                  <div className={`text-xs ${theme.mutedText} mt-0.5`}>
+                    Allow this HOD to review and approve department timetables
+                  </div>
+                </div>
+              </motion.label>
+            </div>
+          </section>
+
+          {/* Login Credentials */}
+          <section>
+            <h2 className="text-sm font-semibold mb-4 flex items-center gap-2">
+              <Lock
+                size={16}
+                className={isDark ? "text-indigo-600" : "text-indigo-400"}
+              />
+              Login Credentials
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <PasswordField
+                id="password"
+                label="Password"
+                value={form.password}
+                onChange={(v) => onChange("password", v)}
+                shown={showPassword}
+                toggle={() => setShowPassword(!showPassword)}
+                error={errors.password}
+                hint="Minimum 8 characters"
+                autoComplete="new-password"
+                theme={theme}
+                isDark={isDark}
+              />
+
+              <PasswordField
+                id="confirmPassword"
+                label="Confirm Password"
+                value={form.confirmPassword}
+                onChange={(v) => onChange("confirmPassword", v)}
+                shown={showConfirm}
+                toggle={() => setShowConfirm(!showConfirm)}
+                error={errors.confirmPassword}
+                autoComplete="new-password"
+                theme={theme}
+                isDark={isDark}
+              />
+            </div>
+
+            {/* Password requirements */}
+            <div
+              className={`mt-4 p-4 rounded-xl border ${
+                isDark
+                  ? "bg-indigo-500/10 border-indigo-500/20"
+                  : "bg-indigo-50 border-indigo-200"
+              }`}
+            >
+              <h3
+                className={`text-sm font-medium mb-2 flex items-center gap-2 ${
+                  isDark ? "text-indigo-300" : "text-indigo-700"
+                }`}
+              >
+                <CheckCircle className="h-4 w-4" />
+                Password Requirements
+              </h3>
+              <ul className="space-y-1 text-xs">
+                {[
+                  {
+                    test: form.password.length >= 8,
+                    label: "Minimum 8 characters",
+                  },
+                  {
+                    test: /[A-Z]/.test(form.password),
+                    label: "At least one uppercase letter",
+                  },
+                  {
+                    test: /[0-9]/.test(form.password),
+                    label: "At least one number",
+                  },
+                  {
+                    test:
+                      form.password === form.confirmPassword &&
+                      form.password !== "",
+                    label: "Passwords match",
+                  },
+                ].map((req, idx) => (
+                  <li
+                    key={idx}
+                    className={`flex items-center gap-1.5 ${
+                      req.test
+                        ? isDark
+                          ? "text-green-400"
+                          : "text-green-600"
+                        : theme.mutedText
+                    }`}
+                  >
+                    <div
+                      className={`w-1.5 h-1.5 rounded-full ${
+                        req.test
+                          ? isDark
+                            ? "bg-green-400"
+                            : "bg-green-600"
+                          : isDark
+                          ? "bg-slate-600"
+                          : "bg-gray-300"
+                      }`}
+                    ></div>
+                    {req.label}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+
+          {/* Actions */}
+          <div
+            className={`flex items-center justify-end gap-3 pt-6 border-t ${theme.cardBorder}`}
+          >
+            <motion.button
+              type="button"
+              onClick={() => navigate(-1)}
+              className={`rounded-xl border ${theme.cardBorder} px-5 py-2.5 font-medium transition-all hover:scale-105`}
+              whileTap={{ scale: 0.95 }}
+            >
+              Cancel
+            </motion.button>
+
+            <motion.button
+              type="submit"
+              className={`rounded-xl px-6 py-2.5 font-medium shadow-lg flex items-center gap-2 transition-all ${
+                isFormComplete
+                  ? `bg-gradient-to-r ${theme.gradient} text-white hover:shadow-xl`
+                  : isDark
+                  ? "bg-slate-700 text-slate-400 cursor-not-allowed"
+                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              }`}
+              whileHover={isFormComplete ? { scale: 1.02 } : {}}
+              whileTap={isFormComplete ? { scale: 0.98 } : {}}
+              disabled={!isFormComplete}
+            >
+              <Save size={18} />
+              Register HOD
+            </motion.button>
+          </div>
+        </form>
       </motion.div>
     </div>
   );
 }
 
-// Reusable Field component
+// Field component
 function Field({
   id,
   label,
@@ -458,18 +489,19 @@ function Field({
   placeholder,
   error,
   autoComplete,
+  theme,
+  isDark,
 }) {
   return (
     <div>
-      <label
-        htmlFor={id}
-        className="block text-sm font-medium text-slate-200 mb-1.5"
-      >
+      <label htmlFor={id} className="block text-sm font-medium mb-1.5">
         {label}
       </label>
       <div className="relative">
         {icon && (
-          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+          <div
+            className={`absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none ${theme.mutedText}`}
+          >
             {icon}
           </div>
         )}
@@ -481,13 +513,17 @@ function Field({
           onChange={(e) => onChange(e.target.value)}
           required
           autoComplete={autoComplete}
-          className={`w-full rounded-xl border bg-slate-800/50 ${
+          className={`w-full rounded-xl border ${
             icon ? "pl-10" : "pl-3"
-          } pr-3 py-2.5 text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-indigo-400/30 transition-all duration-200 ${
+          } pr-3 py-2.5 ${theme.inputBg} ${theme.inputText} ${
             error
-              ? "border-red-500/60 focus:border-red-400"
-              : "border-slate-700/50 focus:border-indigo-400"
-          }`}
+              ? isDark
+                ? "border-red-500/60 focus:border-red-400"
+                : "border-red-300 focus:border-red-500"
+              : `${theme.inputBorder} focus:border-indigo-500`
+          } focus:ring-2 ${
+            isDark ? "focus:ring-indigo-400/30" : "focus:ring-indigo-500/30"
+          } transition-all duration-200 placeholder:${theme.mutedText}`}
           placeholder={placeholder}
           aria-invalid={!!error}
           aria-errormessage={error ? `${id}-error` : undefined}
@@ -496,9 +532,15 @@ function Field({
       {error && (
         <p
           id={`${id}-error`}
-          className="mt-1.5 text-xs text-red-300 flex items-center gap-1"
+          className={`mt-1.5 text-xs flex items-center gap-1 ${
+            isDark ? "text-red-300" : "text-red-600"
+          }`}
         >
-          <span className="inline-block w-1 h-1 bg-red-400 rounded-full"></span>
+          <span
+            className={`inline-block w-1 h-1 rounded-full ${
+              isDark ? "bg-red-400" : "bg-red-600"
+            }`}
+          ></span>
           {error}
         </p>
       )}
@@ -507,18 +549,27 @@ function Field({
 }
 
 // SelectField component
-function SelectField({ id, label, icon, value, onChange, options, error }) {
+function SelectField({
+  id,
+  label,
+  icon,
+  value,
+  onChange,
+  options,
+  error,
+  theme,
+  isDark,
+}) {
   return (
     <div>
-      <label
-        htmlFor={id}
-        className="block text-sm font-medium text-slate-200 mb-1.5"
-      >
+      <label htmlFor={id} className="block text-sm font-medium mb-1.5">
         {label}
       </label>
       <div className="relative">
         {icon && (
-          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+          <div
+            className={`absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none ${theme.mutedText}`}
+          >
             {icon}
           </div>
         )}
@@ -528,20 +579,17 @@ function SelectField({ id, label, icon, value, onChange, options, error }) {
           value={value}
           onChange={(e) => onChange(e.target.value)}
           required
-          className={`w-full rounded-xl border bg-slate-800/50 ${
+          className={`w-full rounded-xl border ${
             icon ? "pl-10" : "pl-3"
-          } pr-10 py-2.5 text-slate-100 appearance-none focus:ring-2 focus:ring-indigo-400/30 transition-all duration-200 ${
+          } pr-10 py-2.5 ${theme.inputBg} ${theme.inputText} appearance-none ${
             error
-              ? "border-red-500/60 focus:border-red-400"
-              : "border-slate-700/50 focus:border-indigo-400"
-          }`}
-          style={{
-            backgroundImage:
-              'url("data:image/svg+xml;utf8,<svg xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 20 20\\" fill=\\"%2394a3b8\\"><path fill-rule=\\"evenodd\\" d=\\"M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z\\" clip-rule=\\"evenodd\\"/></svg>")',
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "right 0.75rem center",
-            backgroundSize: "1.25rem 1.25rem",
-          }}
+              ? isDark
+                ? "border-red-500/60 focus:border-red-400"
+                : "border-red-300 focus:border-red-500"
+              : `${theme.inputBorder} focus:border-indigo-500`
+          } focus:ring-2 ${
+            isDark ? "focus:ring-indigo-400/30" : "focus:ring-indigo-500/30"
+          } transition-all duration-200`}
           aria-invalid={!!error}
           aria-errormessage={error ? `${id}-error` : undefined}
         >
@@ -556,9 +604,15 @@ function SelectField({ id, label, icon, value, onChange, options, error }) {
       {error && (
         <p
           id={`${id}-error`}
-          className="mt-1.5 text-xs text-red-300 flex items-center gap-1"
+          className={`mt-1.5 text-xs flex items-center gap-1 ${
+            isDark ? "text-red-300" : "text-red-600"
+          }`}
         >
-          <span className="inline-block w-1 h-1 bg-red-400 rounded-full"></span>
+          <span
+            className={`inline-block w-1 h-1 rounded-full ${
+              isDark ? "bg-red-400" : "bg-red-600"
+            }`}
+          ></span>
           {error}
         </p>
       )}
@@ -577,18 +631,19 @@ function PasswordField({
   hint,
   error,
   autoComplete,
+  theme,
+  isDark,
 }) {
   return (
     <div>
-      <label
-        htmlFor={id}
-        className="block text-sm font-medium text-slate-200 mb-1.5"
-      >
+      <label htmlFor={id} className="block text-sm font-medium mb-1.5">
         {label}
       </label>
       <div className="relative">
-        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-          <LockIcon className="h-5 w-5 text-slate-500" />
+        <div
+          className={`absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none ${theme.mutedText}`}
+        >
+          <Lock className="h-5 w-5" />
         </div>
         <input
           id={id}
@@ -598,36 +653,50 @@ function PasswordField({
           onChange={(e) => onChange(e.target.value)}
           required
           autoComplete={autoComplete}
-          className={`w-full rounded-xl border bg-slate-800/50 pl-10 pr-12 py-2.5 text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-indigo-400/30 transition-all duration-200 ${
+          className={`w-full rounded-xl border pl-10 pr-12 py-2.5 ${
+            theme.inputBg
+          } ${theme.inputText} ${
             error
-              ? "border-red-500/60 focus:border-red-400"
-              : "border-slate-700/50 focus:border-indigo-400"
-          }`}
+              ? isDark
+                ? "border-red-500/60 focus:border-red-400"
+                : "border-red-300 focus:border-red-500"
+              : `${theme.inputBorder} focus:border-indigo-500`
+          } focus:ring-2 ${
+            isDark ? "focus:ring-indigo-400/30" : "focus:ring-indigo-500/30"
+          } transition-all duration-200 placeholder:${theme.mutedText}`}
           aria-invalid={!!error}
           aria-errormessage={error ? `${id}-error` : undefined}
         />
         <button
           type="button"
           onClick={toggle}
-          className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center rounded-md px-2 py-1 text-slate-400 hover:text-indigo-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
+          className={`absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center rounded-md px-2 py-1 ${
+            theme.mutedText
+          } ${
+            isDark ? "hover:text-indigo-300" : "hover:text-indigo-600"
+          } transition-colors duration-200 focus:outline-none focus:ring-2 ${
+            isDark ? "focus:ring-indigo-400/40" : "focus:ring-indigo-500"
+          }`}
           aria-label={shown ? "Hide password" : "Show password"}
           aria-pressed={shown}
           aria-controls={id}
         >
-          {shown ? (
-            <EyeOffIcon className="h-4 w-4" />
-          ) : (
-            <EyeIcon className="h-4 w-4" />
-          )}
+          {shown ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
         </button>
       </div>
-      {hint && <p className="mt-1.5 text-xs text-slate-400">{hint}</p>}
+      {hint && <p className={`mt-1.5 text-xs ${theme.mutedText}`}>{hint}</p>}
       {error && (
         <p
           id={`${id}-error`}
-          className="mt-1.5 text-xs text-red-300 flex items-center gap-1"
+          className={`mt-1.5 text-xs flex items-center gap-1 ${
+            isDark ? "text-red-300" : "text-red-600"
+          }`}
         >
-          <span className="inline-block w-1 h-1 bg-red-400 rounded-full"></span>
+          <span
+            className={`inline-block w-1 h-1 rounded-full ${
+              isDark ? "bg-red-400" : "bg-red-600"
+            }`}
+          ></span>
           {error}
         </p>
       )}

@@ -1,19 +1,25 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useOutletContext } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  UsersIcon,
-  UserIcon,
-  HomeIcon,
-  SearchIcon,
-  FilterIcon,
-  PrinterIcon,
-  FileBoxIcon,
-  DownloadIcon,
-  CalendarDaysIcon,
-  ClockIcon,
-  BookOpenIcon,
-  GraduationCapIcon,
-  ChevronDownIcon,
+  Users,
+  User,
+  Home,
+  Search,
+  Filter,
+  Printer,
+  FileBox,
+  Download,
+  CalendarDays,
+  Clock,
+  BookOpen,
+  GraduationCap,
+  ChevronDown,
+  Sparkles,
+  Grid3x3,
+  Eye,
 } from "lucide-react";
+
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"];
 const DEFAULT_SLOTS = [
   "09:00",
@@ -24,6 +30,7 @@ const DEFAULT_SLOTS = [
   "15:00",
   "16:00",
 ];
+
 const seedSessions = [
   {
     id: "EDU201-A",
@@ -74,6 +81,7 @@ const seedSessions = [
     durationSlots: 1,
   },
 ];
+
 function loadCalendars() {
   const s = localStorage.getItem("calendarsConstraints");
   const cal = s ? JSON.parse(s) : null;
@@ -82,31 +90,69 @@ function loadCalendars() {
     teachingDays: cal?.teachingDays?.length ? cal.teachingDays : DAYS,
   };
 }
+
 function loadSessions() {
   const s = localStorage.getItem("sessions");
   return s ? JSON.parse(s) : seedSessions;
 }
+
 export default function Timetables() {
+  // Get theme from parent layout
+  const outletContext = useOutletContext();
+  const { theme: contextTheme, isDark: contextIsDark } = outletContext || {};
+
+  const [localIsDark] = useState(true);
+  const isDark = contextIsDark !== undefined ? contextIsDark : localIsDark;
+
+  const defaultTheme = {
+    bg: isDark ? "bg-gray-50" : "bg-slate-950",
+    text: isDark ? "text-gray-900" : "text-slate-50",
+    cardBg: isDark ? "bg-white" : "bg-slate-900/50",
+    cardBorder: isDark ? "border-gray-200" : "border-slate-800/60",
+    mutedText: isDark ? "text-gray-600" : "text-slate-400",
+    gradient: isDark
+      ? "from-indigo-600 via-purple-600 to-pink-600"
+      : "from-indigo-400 via-purple-400 to-pink-400",
+    accentBg: isDark ? "bg-gray-50" : "bg-slate-800/30",
+    accentBorder: isDark ? "border-gray-200" : "border-slate-700/40",
+    hoverBg: isDark ? "hover:bg-gray-50" : "hover:bg-slate-800/50",
+    buttonBg: isDark ? "bg-gray-100" : "bg-slate-800/40",
+    buttonBorder: isDark ? "border-gray-300" : "border-slate-700/60",
+    buttonText: isDark ? "text-gray-900" : "text-slate-200",
+    inputBg: isDark ? "bg-white" : "bg-slate-800/50",
+    inputBorder: isDark ? "border-gray-300" : "border-slate-700",
+    inputText: isDark ? "text-gray-900" : "text-slate-100",
+    tableBorder: isDark ? "border-gray-200" : "border-slate-800/60",
+    tableHeader: isDark ? "bg-gray-50" : "bg-slate-800/40",
+  };
+
+  const theme = contextTheme || defaultTheme;
+
   const { slots, teachingDays } = loadCalendars();
   const [view, setView] = useState("Program");
   const [sessions, setSessions] = useState(loadSessions());
   const [q, setQ] = useState("");
   const [selectedEntity, setSelectedEntity] = useState("");
+
   useEffect(() => {
     localStorage.setItem("sessions", JSON.stringify(sessions));
   }, [sessions]);
+
   const programCohorts = useMemo(
     () => Array.from(new Set(sessions.map((s) => s.cohort))),
     [sessions]
   );
+
   const facultyList = useMemo(
     () => Array.from(new Set(sessions.map((s) => s.faculty))),
     [sessions]
   );
+
   const rooms = useMemo(
     () => Array.from(new Set(sessions.map((s) => s.room))),
     [sessions]
   );
+
   const grid = useMemo(() => {
     const map = {};
     const list = sessions.filter((s) => {
@@ -130,287 +176,433 @@ export default function Timetables() {
     });
     return map;
   }, [sessions, view, selectedEntity, q]);
+
   const entities =
     view === "Program"
       ? programCohorts
       : view === "Faculty"
       ? facultyList
       : rooms;
-  // Get icon based on view
+
   const getViewIcon = () => {
-    if (view === "Program") return <UsersIcon size={16} />;
-    if (view === "Faculty") return <UserIcon size={16} />;
-    return <HomeIcon size={16} />;
+    if (view === "Program") return <Users size={16} />;
+    if (view === "Faculty") return <User size={16} />;
+    return <Home size={16} />;
   };
+
+  // Calculate statistics
+  const stats = useMemo(() => {
+    const filtered = sessions.filter((s) => {
+      if (!selectedEntity) return true;
+      if (view === "Program") return s.cohort === selectedEntity;
+      if (view === "Faculty") return s.faculty === selectedEntity;
+      if (view === "Room") return s.room === selectedEntity;
+      return true;
+    });
+
+    const totalSessions = filtered.length;
+    const lectures = filtered.filter((s) => s.kind === "L").length;
+    const practicals = filtered.filter((s) => s.kind === "P").length;
+    const tutorials = filtered.filter((s) => s.kind === "T").length;
+
+    return { totalSessions, lectures, practicals, tutorials };
+  }, [sessions, view, selectedEntity]);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 to-slate-900 text-slate-100">
+    <div className="space-y-8">
       {/* Page Header */}
-      <div className="max-w-[1280px] mx-auto px-6 pb-6">
-        <h1 className="text-3xl font-extrabold mb-3 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-          Timetables
-        </h1>
-        <p className="text-slate-400">
-          View weekly schedules by Program/Cohort, Faculty, or Room; hover cells
-          for details.
-        </p>
-      </div>
-      <main className="max-w-[1280px] mx-auto px-6 pb-16 space-y-6">
-        {/* Filters */}
-        <section
-          className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 shadow-lg backdrop-blur-sm"
-          aria-labelledby="filters-title"
-        >
-          <h2
-            id="filters-title"
-            className="text-base font-bold mb-4 flex items-center gap-2"
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="flex items-start gap-4 mb-4">
+          <div
+            className={`p-3 rounded-xl ${
+              isDark ? "bg-indigo-100" : "bg-indigo-500/20"
+            }`}
           >
-            <FilterIcon size={18} className="text-indigo-400" />
-            <span>Filters</span>
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-            <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-slate-300">
-                View By
-              </label>
-              <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                  {view === "Program" ? (
-                    <UsersIcon size={16} />
-                  ) : view === "Faculty" ? (
-                    <UserIcon size={16} />
-                  ) : (
-                    <HomeIcon size={16} />
-                  )}
-                </div>
-                <select
-                  className="w-full appearance-none rounded-lg border border-slate-700 bg-slate-800/70 pl-10 pr-10 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-                  value={view}
-                  onChange={(e) => {
-                    setView(e.target.value);
-                    setSelectedEntity("");
-                  }}
-                >
-                  <option>Program</option>
-                  <option>Faculty</option>
-                  <option>Room</option>
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
-                  <ChevronDownIcon size={16} />
-                </div>
-              </div>
+            <Sparkles
+              size={24}
+              className={isDark ? "text-indigo-600" : "text-indigo-400"}
+            />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Timetables</h1>
+            <p className={`text-sm ${theme.mutedText}`}>
+              View weekly schedules by Program/Cohort, Faculty, or Room
+            </p>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <motion.div
+          className={`rounded-xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm p-4 shadow-sm`}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <div className="flex items-center gap-3">
+            <div
+              className={`p-2 rounded-lg ${
+                isDark ? "bg-indigo-100" : "bg-indigo-500/20"
+              }`}
+            >
+              <Grid3x3
+                size={18}
+                className={isDark ? "text-indigo-600" : "text-indigo-400"}
+              />
             </div>
-            <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-slate-300">
-                {view} Selector
-              </label>
-              <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                  {getViewIcon()}
-                </div>
-                <select
-                  className="w-full appearance-none rounded-lg border border-slate-700 bg-slate-800/70 pl-10 pr-10 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-                  value={selectedEntity}
-                  onChange={(e) => setSelectedEntity(e.target.value)}
-                >
-                  <option value="">All</option>
-                  {entities.map((x) => (
-                    <option key={x}>{x}</option>
-                  ))}
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
-                  <ChevronDownIcon size={16} />
-                </div>
-              </div>
+            <div>
+              <p className={`text-xs ${theme.mutedText}`}>Total Sessions</p>
+              <p className="text-xl font-bold">{stats.totalSessions}</p>
             </div>
-            <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-slate-300">
-                Search Course/Title
-              </label>
-              <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                  <SearchIcon size={16} />
-                </div>
-                <input
-                  className="w-full rounded-lg border border-slate-700 bg-slate-800/70 pl-10 pr-4 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-                  type="search"
-                  value={q}
-                  onChange={(e) => setQ(e.target.value)}
-                  placeholder="e.g., EDU201 or Foundations"
-                />
-              </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          className={`rounded-xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm p-4 shadow-sm`}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.05 }}
+        >
+          <div className="flex items-center gap-3">
+            <div
+              className={`p-2 rounded-lg ${
+                isDark ? "bg-blue-100" : "bg-blue-500/20"
+              }`}
+            >
+              <BookOpen
+                size={18}
+                className={isDark ? "text-blue-600" : "text-blue-400"}
+              />
             </div>
-            <div className="flex gap-2 justify-end items-center">
-              <button
-                className="rounded-lg px-4 py-2.5 font-medium border border-slate-700 bg-slate-800/70 hover:bg-slate-800 transition-colors flex items-center gap-2"
-                onClick={() => window.print()}
+            <div>
+              <p className={`text-xs ${theme.mutedText}`}>Lectures</p>
+              <p className="text-xl font-bold">{stats.lectures}</p>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          className={`rounded-xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm p-4 shadow-sm`}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+        >
+          <div className="flex items-center gap-3">
+            <div
+              className={`p-2 rounded-lg ${
+                isDark ? "bg-emerald-100" : "bg-emerald-500/20"
+              }`}
+            >
+              <GraduationCap
+                size={18}
+                className={isDark ? "text-emerald-600" : "text-emerald-400"}
+              />
+            </div>
+            <div>
+              <p className={`text-xs ${theme.mutedText}`}>Practicals</p>
+              <p className="text-xl font-bold">{stats.practicals}</p>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          className={`rounded-xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm p-4 shadow-sm`}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.15 }}
+        >
+          <div className="flex items-center gap-3">
+            <div
+              className={`p-2 rounded-lg ${
+                isDark ? "bg-purple-100" : "bg-purple-500/20"
+              }`}
+            >
+              <Users
+                size={18}
+                className={isDark ? "text-purple-600" : "text-purple-400"}
+              />
+            </div>
+            <div>
+              <p className={`text-xs ${theme.mutedText}`}>Tutorials</p>
+              <p className="text-xl font-bold">{stats.tutorials}</p>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Filters */}
+      <motion.section
+        className={`rounded-2xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm p-6 shadow-sm`}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h2 className="text-base font-bold mb-5 flex items-center gap-2">
+          <Filter
+            size={18}
+            className={isDark ? "text-indigo-600" : "text-indigo-400"}
+          />
+          Filters
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {/* View By */}
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold">View By</label>
+            <div className="relative">
+              <div
+                className={`absolute left-3 top-1/2 -translate-y-1/2 ${theme.mutedText}`}
               >
-                <PrinterIcon size={16} />
-                <span>Export (PDF)</span>
-              </button>
-              <a
-                className="rounded-lg px-4 py-2.5 font-medium bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:from-indigo-600 hover:to-purple-600 transition-colors flex items-center gap-2"
-                href="/exports"
-                onClick={(e) => {
-                  e.preventDefault();
-                  window.location.assign("/exports");
+                {getViewIcon()}
+              </div>
+              <select
+                className={`w-full appearance-none pl-10 pr-10 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
+                value={view}
+                onChange={(e) => {
+                  setView(e.target.value);
+                  setSelectedEntity("");
                 }}
               >
-                <DownloadIcon size={16} />
-                <span>Exports</span>
-              </a>
+                <option>Program</option>
+                <option>Faculty</option>
+                <option>Room</option>
+              </select>
+              <ChevronDown
+                size={16}
+                className={`absolute right-3 top-1/2 -translate-y-1/2 ${theme.mutedText} pointer-events-none`}
+              />
             </div>
           </div>
-        </section>
-        {/* Grid */}
-        <section
-          className="rounded-xl border border-slate-800 bg-slate-900/60 overflow-hidden shadow-lg backdrop-blur-sm"
-          aria-labelledby="grid-title"
-        >
-          <div className="p-5 border-b border-slate-800 flex justify-between items-center">
-            <h2 className="text-base font-bold flex items-center gap-2">
-              <CalendarDaysIcon size={18} className="text-indigo-400" />
-              <span>
-                {view} Timetable {selectedEntity ? `— ${selectedEntity}` : ""}
-              </span>
-            </h2>
-          </div>
-          <div className="overflow-x-auto p-3">
-            <table className="w-full border-collapse">
-              <caption className="sr-only">
-                Weekly timetable with days as columns and named slots as rows
-              </caption>
-              <thead className="text-slate-300">
-                <tr className="border-b border-slate-800">
-                  <th scope="col" className="px-3 py-3 text-left font-medium">
-                    <div className="flex items-center gap-2 text-indigo-300">
-                      <ClockIcon size={16} />
-                      <span>Time</span>
-                    </div>
-                  </th>
-                  {teachingDays.map((d) => (
-                    <th
-                      key={d}
-                      scope="col"
-                      className="px-3 py-3 text-left font-medium"
-                    >
-                      <div className="flex items-center gap-2 text-indigo-300">
-                        <span>{d}</span>
-                      </div>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800">
-                {slots.map((slot) => (
-                  <tr
-                    key={slot}
-                    className="hover:bg-slate-800/30 transition-colors"
-                  >
-                    <th
-                      scope="row"
-                      aria-current="time"
-                      className="px-3 py-3 text-left font-mono text-indigo-200 whitespace-nowrap"
-                    >
-                      {slot}
-                    </th>
-                    {teachingDays.map((day) => {
-                      const key = `${day}|${slot}`;
-                      const cellSessions = grid[key] || [];
-                      return (
-                        <td key={key} className="px-3 py-3 align-top">
-                          <div className="grid gap-2">
-                            {cellSessions.map((s) => (
-                              <SessionPill key={s.id} s={s} />
-                            ))}
-                          </div>
-                        </td>
-                      );
-                    })}
-                  </tr>
+
+          {/* Entity Selector */}
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold">
+              {view} Selector
+            </label>
+            <div className="relative">
+              <div
+                className={`absolute left-3 top-1/2 -translate-y-1/2 ${theme.mutedText}`}
+              >
+                {getViewIcon()}
+              </div>
+              <select
+                className={`w-full appearance-none pl-10 pr-10 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
+                value={selectedEntity}
+                onChange={(e) => setSelectedEntity(e.target.value)}
+              >
+                <option value="">All</option>
+                {entities.map((x) => (
+                  <option key={x}>{x}</option>
                 ))}
-              </tbody>
-            </table>
+              </select>
+              <ChevronDown
+                size={16}
+                className={`absolute right-3 top-1/2 -translate-y-1/2 ${theme.mutedText} pointer-events-none`}
+              />
+            </div>
           </div>
-          {/* Legend */}
-          <div
-            className="border-t border-slate-800 p-4 flex flex-wrap items-center gap-5 text-slate-300"
-            aria-label="Legend"
-          >
-            <span className="inline-flex items-center gap-2">
-              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-extrabold shadow-inner">
-                L
-              </span>
-              <span className="text-sm">Lecture</span>
-            </span>
-            <span className="inline-flex items-center gap-2">
-              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-r from-violet-400 to-violet-500 text-white text-xs font-extrabold shadow-inner">
-                T
-              </span>
-              <span className="text-sm">Tutorial</span>
-            </span>
-            <span className="inline-flex items-center gap-2">
-              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500 text-white text-xs font-extrabold shadow-inner">
-                P
-              </span>
-              <span className="text-sm">Practical</span>
-            </span>
+
+          {/* Search */}
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold">
+              Search Course/Title
+            </label>
+            <div className="relative">
+              <Search
+                size={16}
+                className={`absolute left-3 top-1/2 -translate-y-1/2 ${theme.mutedText}`}
+              />
+              <input
+                className={`w-full pl-10 pr-4 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
+                type="search"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="e.g., EDU201"
+              />
+            </div>
           </div>
-        </section>
-      </main>
+
+          {/* Actions */}
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold">Export</label>
+            <div className="flex gap-2">
+              <motion.button
+                className={`flex-1 rounded-lg px-4 py-2.5 font-medium border ${theme.buttonBorder} ${theme.buttonBg} ${theme.buttonText} transition-colors flex items-center justify-center gap-2 text-sm`}
+                onClick={() => window.print()}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Printer size={16} />
+                PDF
+              </motion.button>
+              <motion.button
+                className={`flex-1 rounded-lg px-4 py-2.5 font-medium bg-gradient-to-r ${theme.gradient} text-white transition-colors flex items-center justify-center gap-2 text-sm shadow-lg`}
+                onClick={() => (window.location.href = "/hod/exports")}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Download size={16} />
+                More
+              </motion.button>
+            </div>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* Timetable Grid */}
+      <motion.section
+        className={`rounded-2xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm overflow-hidden shadow-sm`}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+      >
+        <div className={`p-5 border-b ${theme.cardBorder}`}>
+          <h2 className="text-base font-bold flex items-center gap-2">
+            <CalendarDays
+              size={18}
+              className={isDark ? "text-indigo-600" : "text-indigo-400"}
+            />
+            {view} Timetable {selectedEntity && `— ${selectedEntity}`}
+          </h2>
+        </div>
+
+        <div className="overflow-x-auto p-4">
+          <table className="w-full border-collapse">
+            <thead className={theme.tableHeader}>
+              <tr className={`border-b ${theme.tableBorder}`}>
+                <th className="px-3 py-3 text-left">
+                  <div className="flex items-center gap-2">
+                    <Clock
+                      size={16}
+                      className={isDark ? "text-indigo-600" : "text-indigo-400"}
+                    />
+                    <span className="font-semibold text-sm">Time</span>
+                  </div>
+                </th>
+                {teachingDays.map((d) => (
+                  <th key={d} className="px-3 py-3 text-left">
+                    <span className="font-semibold text-sm">{d}</span>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {slots.map((slot, idx) => (
+                <motion.tr
+                  key={slot}
+                  className={`border-b ${theme.tableBorder} ${theme.hoverBg} transition-colors`}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: idx * 0.05 }}
+                >
+                  <th className="px-3 py-3 text-left font-mono text-sm font-semibold">
+                    {slot}
+                  </th>
+                  {teachingDays.map((day) => {
+                    const key = `${day}|${slot}`;
+                    const cellSessions = grid[key] || [];
+                    return (
+                      <td key={key} className="px-3 py-3 align-top">
+                        <div className="flex flex-col gap-2">
+                          {cellSessions.map((s) => (
+                            <SessionPill key={s.id} s={s} isDark={isDark} />
+                          ))}
+                        </div>
+                      </td>
+                    );
+                  })}
+                </motion.tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Legend */}
+        <div
+          className={`border-t ${theme.tableBorder} p-4 flex flex-wrap items-center gap-5`}
+        >
+          <span className="inline-flex items-center gap-2">
+            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-bold shadow">
+              L
+            </span>
+            <span className="text-sm font-medium">Lecture</span>
+          </span>
+          <span className="inline-flex items-center gap-2">
+            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-r from-violet-500 to-violet-600 text-white text-xs font-bold shadow">
+              T
+            </span>
+            <span className="text-sm font-medium">Tutorial</span>
+          </span>
+          <span className="inline-flex items-center gap-2">
+            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-xs font-bold shadow">
+              P
+            </span>
+            <span className="text-sm font-medium">Practical</span>
+          </span>
+        </div>
+      </motion.section>
     </div>
   );
 }
-function SessionPill({ s }) {
+
+function SessionPill({ s, isDark }) {
   const kindStyles = {
     L: {
-      bg: "bg-blue-500/10",
-      border: "border-blue-500/30",
-      ring: "ring-blue-500/10",
+      bg: isDark ? "bg-blue-50" : "bg-blue-500/10",
+      border: isDark ? "border-blue-200" : "border-blue-500/30",
       badge: "bg-gradient-to-r from-blue-500 to-blue-600",
-      text: "text-blue-300",
+      text: isDark ? "text-blue-700" : "text-blue-300",
     },
     T: {
-      bg: "bg-violet-500/10",
-      border: "border-violet-500/30",
-      ring: "ring-violet-500/10",
-      badge: "bg-gradient-to-r from-violet-400 to-violet-500",
-      text: "text-violet-300",
+      bg: isDark ? "bg-violet-50" : "bg-violet-500/10",
+      border: isDark ? "border-violet-200" : "border-violet-500/30",
+      badge: "bg-gradient-to-r from-violet-500 to-violet-600",
+      text: isDark ? "text-violet-700" : "text-violet-300",
     },
     P: {
-      bg: "bg-emerald-500/10",
-      border: "border-emerald-500/30",
-      ring: "ring-emerald-500/10",
-      badge: "bg-gradient-to-r from-emerald-400 to-emerald-500",
-      text: "text-emerald-300",
+      bg: isDark ? "bg-emerald-50" : "bg-emerald-500/10",
+      border: isDark ? "border-emerald-200" : "border-emerald-500/30",
+      badge: "bg-gradient-to-r from-emerald-500 to-emerald-600",
+      text: isDark ? "text-emerald-700" : "text-emerald-300",
     },
   };
+
   const style = kindStyles[s.kind] || kindStyles.L;
+
   return (
-    <div
-      className={`rounded-lg border ${style.border} ${style.bg} p-2.5 ring-1 ${style.ring} hover:shadow-lg transition-shadow cursor-help`}
+    <motion.div
+      className={`rounded-lg border ${style.border} ${style.bg} p-2.5 hover:shadow-md transition-all cursor-help`}
       title={`${s.course} ${s.title}\n${s.cohort || ""}\n${s.faculty} • ${
         s.room
       }`}
+      whileHover={{ scale: 1.02 }}
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.2 }}
     >
       <div className="flex items-center gap-2 mb-1.5">
         <span
-          className={`inline-flex h-5 w-5 items-center justify-center rounded-full ${style.badge} text-white text-xs font-bold shadow-inner`}
+          className={`inline-flex h-5 w-5 items-center justify-center rounded-full ${style.badge} text-white text-xs font-bold shadow`}
         >
           {s.kind}
         </span>
-        <span className="text-xs font-bold text-white">{s.course}</span>
+        <span className="text-xs font-bold">{s.course}</span>
       </div>
       <div className="flex items-center justify-between text-xs">
-        <span className="flex items-center gap-1 text-slate-300">
-          <HomeIcon size={12} />
+        <span className="flex items-center gap-1">
+          <Home size={12} />
           <span>{s.room}</span>
         </span>
         {s.durationSlots > 1 && (
-          <span className={`${style.text} text-[10px]`}>
+          <span className={`${style.text} text-[10px] font-medium`}>
             {s.durationSlots} slots
           </span>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }

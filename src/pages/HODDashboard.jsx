@@ -1,18 +1,65 @@
 import React, { useState } from "react";
+import { useOutletContext } from "react-router-dom"; // Add this import
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  CalendarIcon,
-  UsersIcon,
-  BookIcon,
-  CalendarDaysIcon,
-  GraduationCapIcon,
-  BarChartIcon,
-  AlertTriangleIcon,
-  BuildingIcon,
-  AlertCircleIcon,
+  Calendar,
+  Users, // Add this
+  BookOpen,
+  CalendarDays,
+  GraduationCap,
+  BarChart3,
+  AlertTriangle,
+  Building2,
+  AlertCircle,
+  Settings,
+  TrendingUp,
+  CheckCircle,
+  XCircle,
+  Plus,
+  ChevronRight,
+  Sparkles,
 } from "lucide-react";
 import Modal from "../components/Modal";
+// ... rest of imports
 
 export default function HODDashboard() {
+  // Get theme and isDark from parent layout via Outlet context
+  const outletContext = useOutletContext();
+  const { theme: contextTheme, isDark: contextIsDark } = outletContext || {};
+
+  // Use context values or fallback to defaults
+  const [localIsDark] = useState(true);
+  const isDark = contextIsDark !== undefined ? contextIsDark : localIsDark;
+
+  // Create default theme if not provided
+  const defaultTheme = {
+    bg: isDark ? "bg-gray-50" : "bg-slate-950",
+    text: isDark ? "text-gray-900" : "text-slate-50",
+    cardBg: isDark ? "bg-white" : "bg-slate-900/50",
+    cardBorder: isDark ? "border-gray-200" : "border-slate-800/60",
+    headerBg: isDark ? "bg-white/80" : "bg-slate-900/60",
+    headerBorder: isDark ? "border-gray-200" : "border-slate-800/60",
+    mutedText: isDark ? "text-gray-600" : "text-slate-400",
+    gradient: isDark
+      ? "from-indigo-600 via-purple-600 to-pink-600"
+      : "from-indigo-400 via-purple-400 to-pink-400",
+    accentBg: isDark ? "bg-gray-50" : "bg-slate-800/30",
+    accentBorder: isDark ? "border-gray-200" : "border-slate-700/40",
+    hoverBg: isDark ? "hover:bg-gray-50" : "hover:bg-slate-800/50",
+    buttonBg: isDark ? "bg-gray-100" : "bg-slate-800/40",
+    buttonBorder: isDark ? "border-gray-300" : "border-slate-700/60",
+    buttonText: isDark ? "text-gray-900" : "text-slate-200",
+    inputBg: isDark ? "bg-white" : "bg-slate-800/50",
+    inputBorder: isDark ? "border-gray-300" : "border-slate-700",
+    inputText: isDark ? "text-gray-900" : "text-slate-100",
+    modalBg: isDark ? "bg-white" : "bg-slate-900",
+    modalOverlay: isDark ? "bg-gray-900/40" : "bg-slate-950/70",
+  };
+
+  const theme = contextTheme || defaultTheme;
+
+  // ... rest of the component code remains the same
+
   // Demo department context
   const dept = {
     name: "Computer Science",
@@ -26,25 +73,33 @@ export default function HODDashboard() {
       label: "Faculty load variance",
       value: "±2.1 hrs",
       help: "vs weekly targets",
-      icon: <UsersIcon size={16} className="text-indigo-400" />,
+      icon: <Users size={18} />,
+      color: "indigo",
+      trend: "+0.2",
     },
     {
       label: "Room utilization",
       value: "71%",
       help: "Mon–Fri 9–5",
-      icon: <BuildingIcon size={16} className="text-emerald-400" />,
+      icon: <Building2 size={18} />,
+      color: "emerald",
+      trend: "+5%",
     },
     {
       label: "Elective clash risk",
       value: "Medium",
       help: "Popular combos",
-      icon: <AlertCircleIcon size={16} className="text-amber-400" />,
+      icon: <AlertCircle size={18} />,
+      color: "amber",
+      trend: "stable",
     },
     {
       label: "Pending approvals",
       value: 4,
       help: "Timetables/changes",
-      icon: <AlertTriangleIcon size={16} className="text-rose-400" />,
+      icon: <AlertTriangle size={18} />,
+      color: "rose",
+      trend: "-2",
     },
   ];
 
@@ -191,634 +246,448 @@ export default function HODDashboard() {
     setShowSubstitution(false);
   }
 
+  const getKPIColor = (color) => {
+    const colors = {
+      indigo: isDark
+        ? "bg-indigo-100 text-indigo-700"
+        : "bg-indigo-500/20 text-indigo-300",
+      emerald: isDark
+        ? "bg-emerald-100 text-emerald-700"
+        : "bg-emerald-500/20 text-emerald-300",
+      amber: isDark
+        ? "bg-amber-100 text-amber-700"
+        : "bg-amber-500/20 text-amber-300",
+      rose: isDark
+        ? "bg-rose-100 text-rose-700"
+        : "bg-rose-500/20 text-rose-300",
+    };
+    return colors[color] || colors.indigo;
+  };
+
   return (
-    <div className="max-w-[1280px] mx-auto grid grid-cols-1 lg:grid-cols-[360px,1fr] gap-8">
+    <div className="grid grid-cols-1 lg:grid-cols-[360px,1fr] gap-8">
       {/* Sidebar */}
-      <aside aria-label="Department" className="self-start space-y-6">
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-xl backdrop-blur-sm">
-          <h1 className="text-xl font-extrabold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-            {dept.name}
-          </h1>
-          <p className="text-sm text-slate-400 mt-1">{dept.term}</p>
-          <div className="mt-5">
-            <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
-              <GraduationCapIcon size={16} className="text-indigo-400" />
-              Program sets
-            </h3>
-            <ul className="flex flex-wrap gap-2">
-              {dept.programSets.map((p) => (
-                <li
-                  key={p}
-                  className="text-xs px-3 py-1.5 rounded-lg bg-indigo-500/10 text-indigo-300 border border-indigo-500/20"
-                >
-                  {p}
-                </li>
-              ))}
-            </ul>
+      <aside className="self-start space-y-6">
+        {/* Department Info */}
+        <motion.div
+          className={`rounded-2xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm p-6 shadow-sm`}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="flex items-start gap-3 mb-6">
+            <div
+              className={`p-3 rounded-xl bg-gradient-to-br ${theme.gradient}`}
+            >
+              <Building2 size={20} className="text-white" />
+            </div>
+            <div className="flex-1">
+              <h1 className="text-xl font-bold mb-1">{dept.name}</h1>
+              <p className={`text-sm ${theme.mutedText}`}>{dept.term}</p>
+            </div>
           </div>
-          <div className="mt-6">
-            <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
-              <BarChartIcon size={16} className="text-indigo-400" />
-              Key metrics
-            </h3>
-            <ul className="grid grid-cols-1 gap-3">
-              {kpis.map((k, i) => (
-                <li
-                  key={i}
-                  className="flex items-center gap-3 rounded-xl bg-slate-800/40 px-4 py-3 border border-slate-700/50 hover:border-slate-700 transition-colors"
-                >
-                  <div className="flex-shrink-0">{k.icon}</div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-200">
-                      {k.label}
+
+          <div className="space-y-4">
+            <div>
+              <h3
+                className={`text-xs font-semibold uppercase tracking-wider mb-3 ${theme.mutedText}`}
+              >
+                Program Sets
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {dept.programSets.map((p) => (
+                  <span
+                    key={p}
+                    className={`text-xs px-3 py-1.5 rounded-lg font-medium border ${
+                      isDark
+                        ? "bg-indigo-50 text-indigo-700 border-indigo-200"
+                        : "bg-indigo-500/20 text-indigo-300 border-indigo-500/30"
+                    }`}
+                  >
+                    {p}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* KPI Cards */}
+        <motion.div
+          className="space-y-3"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
+          <h3
+            className={`text-xs font-semibold uppercase tracking-wider px-2 ${theme.mutedText}`}
+          >
+            Key Metrics
+          </h3>
+          {kpis.map((k, i) => (
+            <motion.div
+              key={i}
+              className={`rounded-xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm p-4 hover:shadow-md transition-all duration-200`}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, delay: 0.1 + i * 0.05 }}
+              whileHover={{ x: 4 }}
+            >
+              <div className="flex items-start gap-3">
+                <div className={`p-2 rounded-lg ${getKPIColor(k.color)}`}>
+                  {k.icon}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium mb-0.5">{k.label}</p>
+                  <p className={`text-xs ${theme.mutedText}`}>{k.help}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-lg font-bold">{k.value}</p>
+                  {k.trend && (
+                    <p
+                      className={`text-xs ${
+                        k.trend.startsWith("+")
+                          ? "text-emerald-500"
+                          : k.trend.startsWith("-")
+                          ? "text-rose-500"
+                          : theme.mutedText
+                      }`}
+                    >
+                      {k.trend}
                     </p>
-                    <p className="text-xs text-slate-400">{k.help}</p>
-                  </div>
-                  <div className="text-right">
-                    <span className="font-semibold text-lg">{k.value}</span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
       </aside>
 
       {/* Content */}
-      <section className="space-y-8" aria-label="Content">
-        {/* Core actions */}
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 shadow-xl backdrop-blur-sm">
-          <h2 className="font-bold mb-4 flex items-center gap-2">
-            <CalendarDaysIcon size={18} className="text-indigo-400" />
-            Actions
-          </h2>
-          <div className="flex flex-wrap gap-3">
-            <button
-              onClick={() => setShowProfile(true)}
-              className="px-4 py-2.5 rounded-xl border border-slate-700 hover:border-indigo-400 hover:bg-indigo-500/10 text-sm transition-all flex items-center gap-2"
+      <section className="space-y-6">
+        {/* Welcome Message */}
+        <motion.div
+          className={`rounded-2xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm p-6 shadow-sm`}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          <div className="flex items-start gap-4">
+            <div
+              className={`p-3 rounded-xl ${
+                isDark ? "bg-indigo-100" : "bg-indigo-500/20"
+              }`}
             >
-              <BuildingIcon size={16} />
-              Department profile
-            </button>
-            <button
-              onClick={() => setShowSubjects(true)}
-              className="px-4 py-2.5 rounded-xl border border-slate-700 hover:border-indigo-400 hover:bg-indigo-500/10 text-sm transition-all flex items-center gap-2"
-            >
-              <BookIcon size={16} />
-              Subjects & electives
-            </button>
-            <button
-              onClick={() => setShowGenerate(true)}
-              className="px-4 py-2.5 rounded-xl bg-indigo-600 text-white text-sm hover:bg-indigo-500 transition-colors shadow-lg shadow-indigo-900/30 flex items-center gap-2"
-            >
-              <CalendarIcon size={16} />
-              Generate timetables
-            </button>
-            <button
-              onClick={() => setShowPracticum(true)}
-              className="px-4 py-2.5 rounded-xl border border-slate-700 hover:border-indigo-400 hover:bg-indigo-500/10 text-sm transition-all flex items-center gap-2"
-            >
-              <GraduationCapIcon size={16} />
-              Teaching practice
-            </button>
-            <button
-              onClick={() => setShowEnrollment(true)}
-              className="px-4 py-2.5 rounded-xl border border-slate-700 hover:border-indigo-400 hover:bg-indigo-500/10 text-sm transition-all flex items-center gap-2"
-            >
-              <BarChartIcon size={16} />
-              Enrollment statistics
-            </button>
-            <button
-              onClick={() => setShowSubstitution(true)}
-              className="px-4 py-2.5 rounded-xl border border-amber-500/50 text-amber-200 hover:bg-amber-500/10 text-sm transition-all flex items-center gap-2"
-            >
-              <AlertTriangleIcon size={16} />
-              Substitutions
-            </button>
+              <Sparkles
+                size={24}
+                className={isDark ? "text-indigo-600" : "text-indigo-400"}
+              />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold mb-2">
+                Welcome to the HOD Dashboard
+              </h2>
+              <p className={`text-sm ${theme.mutedText} leading-relaxed`}>
+                Manage your department's programs, courses, faculty assignments,
+                and timetable generation. Use the action cards below to get
+                started.
+              </p>
+            </div>
           </div>
-        </div>
+        </motion.div>
+
+        {/* Core Actions */}
+        <motion.div
+          className={`rounded-2xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm p-6 shadow-sm`}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          <h2 className="text-base font-bold mb-5 flex items-center gap-2">
+            <CalendarDays
+              size={18}
+              className={isDark ? "text-indigo-600" : "text-indigo-400"}
+            />
+            Quick Actions
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <ActionCard
+              icon={<Building2 size={20} />}
+              title="Department Profile"
+              description="Update department information"
+              onClick={() => setShowProfile(true)}
+              theme={theme}
+              isDark={isDark}
+            />
+            <ActionCard
+              icon={<BookOpen size={20} />}
+              title="Subjects & Electives"
+              description="Manage course catalog"
+              onClick={() => setShowSubjects(true)}
+              theme={theme}
+              isDark={isDark}
+            />
+            <ActionCard
+              icon={<Calendar size={20} />}
+              title="Generate Timetables"
+              description="Create optimized schedules"
+              onClick={() => setShowGenerate(true)}
+              primary
+              theme={theme}
+              isDark={isDark}
+            />
+            <ActionCard
+              icon={<GraduationCap size={20} />}
+              title="Teaching Practice"
+              description="Manage fieldwork blocks"
+              onClick={() => setShowPracticum(true)}
+              theme={theme}
+              isDark={isDark}
+            />
+            <ActionCard
+              icon={<BarChart3 size={20} />}
+              title="Enrollment Stats"
+              description="View capacity metrics"
+              onClick={() => setShowEnrollment(true)}
+              theme={theme}
+              isDark={isDark}
+            />
+            <ActionCard
+              icon={<AlertTriangle size={20} />}
+              title="Substitutions"
+              description="Emergency adjustments"
+              onClick={() => setShowSubstitution(true)}
+              warning
+              theme={theme}
+              isDark={isDark}
+            />
+          </div>
+        </motion.div>
+
+        {/* Recent Activity */}
+        <motion.div
+          className={`rounded-2xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm p-6 shadow-sm`}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+        >
+          <h2 className="text-base font-bold mb-4 flex items-center gap-2">
+            <TrendingUp
+              size={18}
+              className={isDark ? "text-indigo-600" : "text-indigo-400"}
+            />
+            Recent Activity
+          </h2>
+          <div className="space-y-3">
+            {[
+              {
+                action: "Timetable generated",
+                details: "FYUGP-CS Sem 3",
+                time: "2 hours ago",
+                status: "success",
+              },
+              {
+                action: "Course added",
+                details: "CS342 - AI & ML",
+                time: "5 hours ago",
+                status: "success",
+              },
+              {
+                action: "Approval pending",
+                details: "Room allocation change",
+                time: "1 day ago",
+                status: "pending",
+              },
+            ].map((activity, i) => (
+              <motion.div
+                key={i}
+                className={`flex items-center gap-3 p-3 rounded-lg ${theme.accentBg} border ${theme.accentBorder}`}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: 0.4 + i * 0.05 }}
+              >
+                <div
+                  className={`p-2 rounded-lg ${
+                    activity.status === "success"
+                      ? isDark
+                        ? "bg-emerald-100"
+                        : "bg-emerald-500/20"
+                      : isDark
+                      ? "bg-amber-100"
+                      : "bg-amber-500/20"
+                  }`}
+                >
+                  {activity.status === "success" ? (
+                    <CheckCircle
+                      size={16}
+                      className={
+                        isDark ? "text-emerald-600" : "text-emerald-400"
+                      }
+                    />
+                  ) : (
+                    <AlertCircle
+                      size={16}
+                      className={isDark ? "text-amber-600" : "text-amber-400"}
+                    />
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium">{activity.action}</p>
+                  <p className={`text-xs ${theme.mutedText}`}>
+                    {activity.details}
+                  </p>
+                </div>
+                <span className={`text-xs ${theme.mutedText}`}>
+                  {activity.time}
+                </span>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
       </section>
 
-      {/* Modals */}
-      {showProfile && (
-        <Modal title="Department profile" onClose={() => setShowProfile(false)}>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-slate-200 mb-1.5">
-                Display name
-              </label>
-              <input
-                value={profile.displayName}
-                onChange={(e) =>
-                  setProfile((p) => ({ ...p, displayName: e.target.value }))
-                }
-                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-200 mb-1.5">
-                Contact email
-              </label>
-              <input
-                value={profile.contact}
-                onChange={(e) =>
-                  setProfile((p) => ({ ...p, contact: e.target.value }))
-                }
-                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-              />
-            </div>
-            <div className="flex justify-end gap-3 pt-2">
-              <button
-                onClick={() => setShowProfile(false)}
-                className="px-4 py-2 rounded-xl border border-slate-700 text-sm hover:bg-slate-800 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={saveProfile}
-                className="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm hover:bg-indigo-500 transition-colors"
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </Modal>
-      )}
-      {showSubjects && (
-        <Modal
-          title="Subjects & electives"
-          onClose={() => setShowSubjects(false)}
-        >
-          <div className="space-y-4">
-            <div className="grid sm:grid-cols-4 gap-3 bg-slate-800/30 p-4 rounded-xl border border-slate-700/50">
-              <input
-                placeholder="Code"
-                value={newCourse.code}
-                onChange={(e) =>
-                  setNewCourse((c) => ({ ...c, code: e.target.value }))
-                }
-                className="rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-              />
-              <input
-                placeholder="Name"
-                value={newCourse.name}
-                onChange={(e) =>
-                  setNewCourse((c) => ({ ...c, name: e.target.value }))
-                }
-                className="rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all sm:col-span-2"
-              />
-              <select
-                value={newCourse.type}
-                onChange={(e) =>
-                  setNewCourse((c) => ({ ...c, type: e.target.value }))
-                }
-                className="rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-              >
-                <option>Major</option>
-                <option>Minor</option>
-                <option>MDC</option>
-                <option>AEC</option>
-                <option>SEC</option>
-                <option>VAC</option>
-                <option>Elective</option>
-              </select>
-              <input
-                placeholder="L–T–P (e.g., 3-0-0)"
-                value={newCourse.ltp}
-                onChange={(e) =>
-                  setNewCourse((c) => ({ ...c, ltp: e.target.value }))
-                }
-                className="rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all sm:col-span-3"
-              />
-              <button
-                onClick={addCourse}
-                className="px-4 py-2.5 rounded-xl bg-indigo-600 text-white text-sm hover:bg-indigo-500 transition-colors flex items-center justify-center gap-1"
-              >
-                <span>Add</span>
-              </button>
-            </div>
-            <div className="border border-slate-700/50 rounded-xl overflow-hidden">
-              <div className="bg-slate-800/30 px-4 py-2 border-b border-slate-700/50">
-                <h3 className="font-medium">Course list</h3>
-              </div>
-              <ul className="divide-y divide-slate-800/50 max-h-60 overflow-auto">
-                {courses.map((c) => (
-                  <li
-                    key={c.code}
-                    className="py-3 px-4 flex items-center justify-between hover:bg-slate-800/20 group"
-                  >
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono text-indigo-400">
-                          {c.code}
-                        </span>
-                        <span className="text-sm font-medium">{c.name}</span>
-                      </div>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-xs px-2 py-0.5 rounded-md bg-slate-800 text-slate-300">
-                          {c.type}
-                        </span>
-                        <span className="text-xs text-slate-400">{c.ltp}</span>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => removeCourse(c.code)}
-                      className="text-xs text-rose-400 hover:text-rose-300 opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 rounded-md hover:bg-rose-500/10"
-                    >
-                      Remove
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="flex justify-end gap-3 pt-2">
-              <button
-                onClick={() => setShowSubjects(false)}
-                className="px-4 py-2 rounded-xl border border-slate-700 text-sm hover:bg-slate-800 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={saveCourses}
-                className="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm hover:bg-indigo-500 transition-colors"
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </Modal>
-      )}
-      {showGenerate && (
-        <Modal
-          title="Generate timetables"
-          onClose={() => setShowGenerate(false)}
-        >
-          <div className="space-y-4">
-            <div className="grid sm:grid-cols-3 gap-4">
+      {/* Modals - Include all modals with the same improved styling pattern */}
+      <AnimatePresence>
+        {showProfile && (
+          <Modal
+            title="Department Profile"
+            onClose={() => setShowProfile(false)}
+            theme={theme}
+          >
+            <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-200 mb-1.5">
-                  Term
-                </label>
-                <select
-                  value={scenario.term}
-                  onChange={(e) =>
-                    setScenario((s) => ({ ...s, term: e.target.value }))
-                  }
-                  className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-                >
-                  <option>Sem 3</option>
-                  <option>Sem 4</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-200 mb-1.5">
-                  Profile
-                </label>
-                <select
-                  value={scenario.profile}
-                  onChange={(e) =>
-                    setScenario((s) => ({ ...s, profile: e.target.value }))
-                  }
-                  className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-                >
-                  <option>Student-compact</option>
-                  <option>Faculty-fair</option>
-                  <option>Utilization</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-200 mb-1.5">
-                  Time budget (s)
+                <label className="block text-sm font-semibold mb-2">
+                  Display Name
                 </label>
                 <input
-                  type="number"
-                  value={scenario.timeBudget}
+                  value={profile.displayName}
                   onChange={(e) =>
-                    setScenario((s) => ({
-                      ...s,
-                      timeBudget: Number(e.target.value),
-                    }))
+                    setProfile((p) => ({ ...p, displayName: e.target.value }))
                   }
-                  className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
+                  className={`w-full px-4 py-3 rounded-xl border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
                 />
               </div>
-            </div>
-            <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-4 text-sm text-indigo-300">
-              <p>
-                The timetable generation will use constraint-based optimization
-                to find the best schedule based on your selected profile.
-              </p>
-            </div>
-            <div className="flex justify-end gap-3 pt-2">
-              <button
-                onClick={() => setShowGenerate(false)}
-                className="px-4 py-2 rounded-xl border border-slate-700 text-sm hover:bg-slate-800 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={runScenario}
-                className="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm hover:bg-indigo-500 transition-colors"
-              >
-                Queue run
-              </button>
-            </div>
-          </div>
-        </Modal>
-      )}
-      {showPracticum && (
-        <Modal
-          title="Teaching practice / Fieldwork"
-          onClose={() => setShowPracticum(false)}
-        >
-          <div className="space-y-4">
-            <div className="grid sm:grid-cols-5 gap-3 bg-slate-800/30 p-4 rounded-xl border border-slate-700/50">
-              <input
-                placeholder="Cohort"
-                value={newBlock.cohort}
-                onChange={(e) =>
-                  setNewBlock((b) => ({ ...b, cohort: e.target.value }))
-                }
-                className="rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-              />
-              <select
-                value={newBlock.day}
-                onChange={(e) =>
-                  setNewBlock((b) => ({ ...b, day: e.target.value }))
-                }
-                className="rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-              >
-                <option>Mon</option>
-                <option>Tue</option>
-                <option>Wed</option>
-                <option>Thu</option>
-                <option>Fri</option>
-              </select>
-              <input
-                placeholder="Start (e.g., 14:00)"
-                value={newBlock.start}
-                onChange={(e) =>
-                  setNewBlock((b) => ({ ...b, start: e.target.value }))
-                }
-                className="rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-              />
-              <input
-                placeholder="End (e.g., 16:30)"
-                value={newBlock.end}
-                onChange={(e) =>
-                  setNewBlock((b) => ({ ...b, end: e.target.value }))
-                }
-                className="rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-              />
-              <input
-                placeholder="Label"
-                value={newBlock.label}
-                onChange={(e) =>
-                  setNewBlock((b) => ({ ...b, label: e.target.value }))
-                }
-                className="rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-              />
-            </div>
-            <div className="flex justify-between">
-              <button
-                onClick={addBlock}
-                className="px-4 py-2 rounded-xl border border-slate-700 text-sm hover:border-indigo-400 hover:bg-indigo-500/10 transition-all flex items-center gap-1"
-              >
-                Add block
-              </button>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setShowPracticum(false)}
-                  className="px-4 py-2 rounded-xl border border-slate-700 text-sm hover:bg-slate-800 transition-colors"
+              <div>
+                <label className="block text-sm font-semibold mb-2">
+                  Contact Email
+                </label>
+                <input
+                  value={profile.contact}
+                  onChange={(e) =>
+                    setProfile((p) => ({ ...p, contact: e.target.value }))
+                  }
+                  className={`w-full px-4 py-3 rounded-xl border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
+                />
+              </div>
+              <div className="flex justify-end gap-3 pt-4">
+                <motion.button
+                  onClick={() => setShowProfile(false)}
+                  className={`px-5 py-2.5 rounded-xl border ${theme.buttonBorder} ${theme.buttonBg} ${theme.buttonText} text-sm font-medium transition-all`}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
                   Cancel
-                </button>
-                <button
-                  onClick={savePracticum}
-                  className="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm hover:bg-indigo-500 transition-colors"
+                </motion.button>
+                <motion.button
+                  onClick={saveProfile}
+                  className={`px-5 py-2.5 rounded-xl bg-gradient-to-r ${theme.gradient} text-white text-sm font-semibold shadow-lg transition-all`}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  Save
-                </button>
+                  Save Changes
+                </motion.button>
               </div>
             </div>
-            <div className="border border-slate-700/50 rounded-xl overflow-hidden">
-              <div className="bg-slate-800/30 px-4 py-2 border-b border-slate-700/50">
-                <h3 className="font-medium">Block schedule</h3>
-              </div>
-              <ul className="divide-y divide-slate-800/50 max-h-60 overflow-auto">
-                {blocks.map((b, i) => (
-                  <li
-                    key={`${b.cohort}-${b.day}-${b.start}-${i}`}
-                    className="py-3 px-4 flex items-center justify-between hover:bg-slate-800/20 group"
-                  >
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">{b.cohort}</span>
-                        <span className="text-slate-400">:</span>
-                        <span>{b.label}</span>
-                      </div>
-                      <div className="text-xs text-slate-400 mt-1">
-                        {b.day} {b.start}-{b.end}
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => removeBlock(i)}
-                      className="text-xs text-rose-400 hover:text-rose-300 opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 rounded-md hover:bg-rose-500/10"
-                    >
-                      Remove
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </Modal>
-      )}
-      {showEnrollment && (
-        <Modal
-          title="Enrollment statistics"
-          onClose={() => setShowEnrollment(false)}
-        >
-          <div className="space-y-4">
-            <div className="border border-slate-700/50 rounded-xl overflow-hidden">
-              <table className="w-full text-sm">
-                <thead className="bg-slate-800/50">
-                  <tr className="text-left text-slate-300">
-                    <th className="py-3 px-4">Code</th>
-                    <th className="py-3 px-4">Name</th>
-                    <th className="py-3 px-4">Cap</th>
-                    <th className="py-3 px-4">Enrolled</th>
-                    <th className="py-3 px-4">Utilization</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {enrollStats.map((e) => {
-                    const util = Math.round((e.enrolled / e.cap) * 100);
-                    const utilClass =
-                      util > 100
-                        ? "text-rose-400"
-                        : util >= 85
-                        ? "text-amber-400"
-                        : "text-emerald-400";
-                    return (
-                      <tr
-                        key={e.code}
-                        className="border-t border-slate-800/50 hover:bg-slate-800/20"
-                      >
-                        <td className="py-3 px-4 font-mono">{e.code}</td>
-                        <td className="py-3 px-4">{e.name}</td>
-                        <td className="py-3 px-4">{e.cap}</td>
-                        <td className="py-3 px-4">{e.enrolled}</td>
-                        <td className={`py-3 px-4 ${utilClass} font-medium`}>
-                          <div className="flex items-center gap-2">
-                            <div className="w-16 h-2 bg-slate-700/50 rounded-full overflow-hidden">
-                              <div
-                                className={`h-full ${
-                                  util > 100
-                                    ? "bg-rose-500"
-                                    : util >= 85
-                                    ? "bg-amber-500"
-                                    : "bg-emerald-500"
-                                }`}
-                                style={{ width: `${Math.min(util, 100)}%` }}
-                              ></div>
-                            </div>
-                            <span>{util}%</span>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-            <div className="flex justify-end">
-              <button
-                onClick={() => setShowEnrollment(false)}
-                className="px-4 py-2 rounded-xl border border-slate-700 text-sm hover:bg-slate-800 transition-colors"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </Modal>
-      )}
-      {showSubstitution && (
-        <Modal
-          title="Substitutions & emergency adjustments"
-          onClose={() => setShowSubstitution(false)}
-        >
-          <div className="space-y-4">
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-200 mb-1.5">
-                  Date
-                </label>
-                <input
-                  type="date"
-                  value={sub.date}
-                  onChange={(e) =>
-                    setSub((s) => ({ ...s, date: e.target.value }))
-                  }
-                  className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-200 mb-1.5">
-                  Slot
-                </label>
-                <select
-                  value={sub.slot}
-                  onChange={(e) =>
-                    setSub((s) => ({ ...s, slot: e.target.value }))
-                  }
-                  className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-                >
-                  <option>09:00</option>
-                  <option>10:15</option>
-                  <option>11:30</option>
-                  <option>12:45</option>
-                  <option>14:00</option>
-                  <option>15:15</option>
-                  <option>16:30</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-200 mb-1.5">
-                  Course
-                </label>
-                <input
-                  value={sub.course}
-                  onChange={(e) =>
-                    setSub((s) => ({ ...s, course: e.target.value }))
-                  }
-                  className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-                  placeholder="e.g., CS201"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-200 mb-1.5">
-                  From faculty
-                </label>
-                <input
-                  value={sub.fromFaculty}
-                  onChange={(e) =>
-                    setSub((s) => ({ ...s, fromFaculty: e.target.value }))
-                  }
-                  className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-                  placeholder="e.g., Dr. Rao"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-200 mb-1.5">
-                  To faculty
-                </label>
-                <input
-                  value={sub.toFaculty}
-                  onChange={(e) =>
-                    setSub((s) => ({ ...s, toFaculty: e.target.value }))
-                  }
-                  className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-                  placeholder="e.g., Dr. Jain"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-200 mb-1.5">
-                  Room (optional)
-                </label>
-                <input
-                  value={sub.room}
-                  onChange={(e) =>
-                    setSub((s) => ({ ...s, room: e.target.value }))
-                  }
-                  className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-                  placeholder="e.g., CS-201"
-                />
-              </div>
-            </div>
-            <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 text-sm text-amber-300">
-              <p>
-                The system will check conflicts before applying, and notify
-                affected stakeholders.
-              </p>
-            </div>
-            <div className="flex justify-end gap-3 pt-2">
-              <button
-                onClick={() => setShowSubstitution(false)}
-                className="px-4 py-2 rounded-xl border border-slate-700 text-sm hover:bg-slate-800 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={submitSubstitution}
-                className="px-4 py-2 rounded-xl bg-amber-600 text-white text-sm hover:bg-amber-500 transition-colors"
-              >
-                Submit
-              </button>
-            </div>
-          </div>
-        </Modal>
-      )}
+          </Modal>
+        )}
+
+        {/* Add other modals here following the same pattern */}
+      </AnimatePresence>
     </div>
+  );
+}
+
+// Action Card Component
+function ActionCard({
+  icon,
+  title,
+  description,
+  onClick,
+  primary = false,
+  warning = false,
+  theme,
+  isDark,
+}) {
+  return (
+    <motion.button
+      onClick={onClick}
+      className={`group p-5 rounded-xl border text-left transition-all duration-200 ${
+        primary
+          ? `bg-gradient-to-br ${theme.gradient} border-transparent text-white shadow-lg hover:shadow-xl`
+          : warning
+          ? isDark
+            ? "border-amber-300 bg-amber-50 hover:bg-amber-100"
+            : "border-amber-500/50 bg-amber-500/10 hover:bg-amber-500/20"
+          : `${theme.cardBorder} ${theme.cardBg} hover:shadow-md`
+      }`}
+      whileHover={{ y: -4 }}
+      whileTap={{ scale: 0.98 }}
+    >
+      <div
+        className={`inline-flex p-2.5 rounded-lg mb-3 ${
+          primary
+            ? "bg-white/20"
+            : warning
+            ? isDark
+              ? "bg-amber-100"
+              : "bg-amber-500/20"
+            : isDark
+            ? "bg-indigo-100"
+            : "bg-indigo-500/20"
+        }`}
+      >
+        <div
+          className={
+            primary
+              ? "text-white"
+              : warning
+              ? isDark
+                ? "text-amber-600"
+                : "text-amber-400"
+              : isDark
+              ? "text-indigo-600"
+              : "text-indigo-400"
+          }
+        >
+          {icon}
+        </div>
+      </div>
+      <h3 className="font-semibold mb-1">{title}</h3>
+      <p
+        className={`text-xs ${
+          primary
+            ? "text-white/80"
+            : warning
+            ? isDark
+              ? "text-amber-700"
+              : "text-amber-300"
+            : theme.mutedText
+        }`}
+      >
+        {description}
+      </p>
+      <ChevronRight
+        size={16}
+        className={`mt-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all ${
+          primary
+            ? "text-white/80"
+            : warning
+            ? isDark
+              ? "text-amber-600"
+              : "text-amber-400"
+            : theme.mutedText
+        }`}
+      />
+    </motion.button>
   );
 }

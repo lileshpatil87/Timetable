@@ -1,30 +1,24 @@
 import React, { useMemo, useState } from "react";
+import { useOutletContext } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  SearchIcon,
-  FilterIcon,
-  BuildingIcon,
-  LayoutGridIcon,
-  UsersIcon,
-  ClipboardListIcon,
-  AlertTriangleIcon,
-  CheckCircleIcon,
-  MapPinIcon,
-  CalendarIcon,
+  Search,
+  Filter,
+  Building2,
+  LayoutGrid,
+  Users,
+  ClipboardList,
+  AlertTriangle,
+  CheckCircle,
+  MapPin,
+  Calendar,
+  Sparkles,
+  Monitor,
+  Palette,
+  TrendingUp,
 } from "lucide-react";
 
 const TYPES = ["Lecture", "Lab", "Studio"];
-
-const ROOM_TYPE_COLORS = {
-  Lecture: "bg-blue-500/20 text-blue-300 border-blue-400/40",
-  Lab: "bg-green-500/20 text-green-300 border-green-400/40",
-  Studio: "bg-purple-500/20 text-purple-300 border-purple-400/40",
-};
-
-const ROOM_TYPE_ICONS = {
-  Lecture: <LayoutGridIcon size={14} />,
-  Lab: <BuildingIcon size={14} />,
-  Studio: <CalendarIcon size={14} />,
-};
 
 const SEED_ROOMS = [
   {
@@ -96,6 +90,37 @@ const SEED_ROOMS = [
 ];
 
 export default function ViewRooms() {
+  // Get theme from parent layout
+  const outletContext = useOutletContext();
+  const { theme: contextTheme, isDark: contextIsDark } = outletContext || {};
+
+  const [localIsDark] = useState(true);
+  const isDark = contextIsDark !== undefined ? contextIsDark : localIsDark;
+
+  const defaultTheme = {
+    bg: isDark ? "bg-gray-50" : "bg-slate-950",
+    text: isDark ? "text-gray-900" : "text-slate-50",
+    cardBg: isDark ? "bg-white" : "bg-slate-900/50",
+    cardBorder: isDark ? "border-gray-200" : "border-slate-800/60",
+    mutedText: isDark ? "text-gray-600" : "text-slate-400",
+    gradient: isDark
+      ? "from-indigo-600 via-purple-600 to-pink-600"
+      : "from-indigo-400 via-purple-400 to-pink-400",
+    accentBg: isDark ? "bg-gray-50" : "bg-slate-800/30",
+    accentBorder: isDark ? "border-gray-200" : "border-slate-700/40",
+    hoverBg: isDark ? "hover:bg-gray-50" : "hover:bg-slate-800/50",
+    buttonBg: isDark ? "bg-gray-100" : "bg-slate-800/40",
+    buttonBorder: isDark ? "border-gray-300" : "border-slate-700/60",
+    buttonText: isDark ? "text-gray-900" : "text-slate-200",
+    inputBg: isDark ? "bg-white" : "bg-slate-800/50",
+    inputBorder: isDark ? "border-gray-300" : "border-slate-700",
+    inputText: isDark ? "text-gray-900" : "text-slate-100",
+    tableBorder: isDark ? "border-gray-200" : "border-slate-800/60",
+    tableHeader: isDark ? "bg-gray-50" : "bg-slate-800/40",
+  };
+
+  const theme = contextTheme || defaultTheme;
+
   const [rooms] = useState(SEED_ROOMS);
   const [filters, setFilters] = useState({
     q: "",
@@ -123,259 +148,433 @@ export default function ViewRooms() {
     });
   }, [rooms, filters]);
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 to-slate-900 text-slate-100">
-      {/* Page Header */}
-      <div className="max-w-[1280px] mx-auto px-6 py-6">
-        <h1 className="text-3xl font-extrabold mb-3 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-          View Rooms & Resources
-        </h1>
-        <p className="text-slate-400">
-          Browse all available rooms, labs, and studios with their capacities
-          and equipment.
-        </p>
-      </div>
+  const getRoomTypeColor = (type) => {
+    if (type === "Lecture") {
+      return isDark
+        ? "bg-blue-100 text-blue-700 border-blue-200"
+        : "bg-blue-500/20 text-blue-300 border-blue-400/40";
+    }
+    if (type === "Lab") {
+      return isDark
+        ? "bg-emerald-100 text-emerald-700 border-emerald-200"
+        : "bg-emerald-500/20 text-emerald-300 border-emerald-400/40";
+    }
+    return isDark
+      ? "bg-purple-100 text-purple-700 border-purple-200"
+      : "bg-purple-500/20 text-purple-300 border-purple-400/40";
+  };
 
-      <main className="max-w-[1280px] mx-auto px-6 pb-16 space-y-6">
-        {/* Filters */}
-        <section
-          className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 shadow-lg backdrop-blur-sm"
-          aria-labelledby="filters-title"
-        >
-          <h2
-            id="filters-title"
-            className="text-base font-bold mb-4 flex items-center gap-2"
+  const getRoomTypeIcon = (type) => {
+    if (type === "Lecture") return <LayoutGrid size={14} />;
+    if (type === "Lab") return <Monitor size={14} />;
+    return <Palette size={14} />;
+  };
+
+  // Calculate statistics
+  const stats = useMemo(() => {
+    const totalCapacity = rooms.reduce((sum, r) => sum + r.capacity, 0);
+    const withEquipment = rooms.filter((r) => r.equipment.length > 0).length;
+    const withBlackouts = rooms.filter((r) => r.blackouts.length > 0).length;
+
+    return {
+      total: rooms.length,
+      totalCapacity,
+      avgCapacity: Math.round(totalCapacity / rooms.length),
+      withEquipment,
+      withBlackouts,
+    };
+  }, [rooms]);
+
+  return (
+    <div className="space-y-8">
+      {/* Page Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="flex items-start gap-4 mb-4">
+          <div
+            className={`p-3 rounded-xl ${
+              isDark ? "bg-indigo-100" : "bg-indigo-500/20"
+            }`}
           >
-            <FilterIcon size={18} className="text-indigo-400" />
-            <span>Filter Rooms</span>
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-500">
-                <SearchIcon size={16} />
-              </div>
-              <input
-                type="search"
-                placeholder="Room name"
-                value={filters.q}
-                onChange={(e) =>
-                  setFilters((f) => ({
-                    ...f,
-                    q: e.target.value,
-                  }))
-                }
-                className="w-full rounded-lg border border-slate-700 bg-slate-800/70 pl-10 pr-4 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
+            <Sparkles
+              size={24}
+              className={isDark ? "text-indigo-600" : "text-indigo-400"}
+            />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold mb-2">View Rooms & Resources</h1>
+            <p className={`text-sm ${theme.mutedText}`}>
+              Browse all available rooms, labs, and studios with their
+              capacities and equipment
+            </p>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <motion.div
+          className={`rounded-xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm p-4 shadow-sm`}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <div className="flex items-center gap-3">
+            <div
+              className={`p-2 rounded-lg ${
+                isDark ? "bg-indigo-100" : "bg-indigo-500/20"
+              }`}
+            >
+              <Building2
+                size={18}
+                className={isDark ? "text-indigo-600" : "text-indigo-400"}
               />
             </div>
+            <div>
+              <p className={`text-xs ${theme.mutedText}`}>Total Rooms</p>
+              <p className="text-xl font-bold">{stats.total}</p>
+            </div>
+          </div>
+        </motion.div>
 
-            <div className="relative">
-              <select
-                value={filters.type}
-                onChange={(e) =>
-                  setFilters((f) => ({
-                    ...f,
-                    type: e.target.value,
-                  }))
-                }
-                className="w-full appearance-none rounded-lg border border-slate-700 bg-slate-800/70 pl-4 pr-10 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-                style={{
-                  backgroundImage:
-                    'url("data:image/svg+xml;utf8,<svg xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 20 20\\" fill=\\"%2394a3b8\\"><path fill-rule=\\"evenodd\\" d=\\"M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z\\" clip-rule=\\"evenodd\\"/></svg>")',
-                  backgroundRepeat: "no-repeat",
-                  backgroundPosition: "right 0.75rem center",
-                  backgroundSize: "1.25rem 1.25rem",
-                }}
-              >
-                <option>All</option>
-                {TYPES.map((t) => (
-                  <option key={t}>{t}</option>
+        <motion.div
+          className={`rounded-xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm p-4 shadow-sm`}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.05 }}
+        >
+          <div className="flex items-center gap-3">
+            <div
+              className={`p-2 rounded-lg ${
+                isDark ? "bg-blue-100" : "bg-blue-500/20"
+              }`}
+            >
+              <Users
+                size={18}
+                className={isDark ? "text-blue-600" : "text-blue-400"}
+              />
+            </div>
+            <div>
+              <p className={`text-xs ${theme.mutedText}`}>Total Capacity</p>
+              <p className="text-xl font-bold">{stats.totalCapacity}</p>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          className={`rounded-xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm p-4 shadow-sm`}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+        >
+          <div className="flex items-center gap-3">
+            <div
+              className={`p-2 rounded-lg ${
+                isDark ? "bg-emerald-100" : "bg-emerald-500/20"
+              }`}
+            >
+              <TrendingUp
+                size={18}
+                className={isDark ? "text-emerald-600" : "text-emerald-400"}
+              />
+            </div>
+            <div>
+              <p className={`text-xs ${theme.mutedText}`}>Avg. Capacity</p>
+              <p className="text-xl font-bold">{stats.avgCapacity}</p>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          className={`rounded-xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm p-4 shadow-sm`}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.15 }}
+        >
+          <div className="flex items-center gap-3">
+            <div
+              className={`p-2 rounded-lg ${
+                isDark ? "bg-purple-100" : "bg-purple-500/20"
+              }`}
+            >
+              <MapPin
+                size={18}
+                className={isDark ? "text-purple-600" : "text-purple-400"}
+              />
+            </div>
+            <div>
+              <p className={`text-xs ${theme.mutedText}`}>With Equipment</p>
+              <p className="text-xl font-bold">{stats.withEquipment}</p>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          className={`rounded-xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm p-4 shadow-sm`}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+        >
+          <div className="flex items-center gap-3">
+            <div
+              className={`p-2 rounded-lg ${
+                isDark ? "bg-amber-100" : "bg-amber-500/20"
+              }`}
+            >
+              <AlertTriangle
+                size={18}
+                className={isDark ? "text-amber-600" : "text-amber-400"}
+              />
+            </div>
+            <div>
+              <p className={`text-xs ${theme.mutedText}`}>With Blackouts</p>
+              <p className="text-xl font-bold">{stats.withBlackouts}</p>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Filters */}
+      <motion.section
+        className={`rounded-2xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm p-6 shadow-sm`}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h2 className="text-base font-bold mb-5 flex items-center gap-2">
+          <Filter
+            size={18}
+            className={isDark ? "text-indigo-600" : "text-indigo-400"}
+          />
+          Filter Rooms
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="relative">
+            <Search
+              size={16}
+              className={`absolute left-3 top-1/2 -translate-y-1/2 ${theme.mutedText}`}
+            />
+            <input
+              type="search"
+              placeholder="Room name"
+              value={filters.q}
+              onChange={(e) =>
+                setFilters((f) => ({
+                  ...f,
+                  q: e.target.value,
+                }))
+              }
+              className={`w-full pl-10 pr-4 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
+            />
+          </div>
+
+          <select
+            value={filters.type}
+            onChange={(e) =>
+              setFilters((f) => ({
+                ...f,
+                type: e.target.value,
+              }))
+            }
+            className={`w-full px-4 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all appearance-none`}
+          >
+            <option>All</option>
+            {TYPES.map((t) => (
+              <option key={t}>{t}</option>
+            ))}
+          </select>
+
+          <input
+            type="number"
+            placeholder="Min capacity"
+            value={filters.minCap}
+            onChange={(e) =>
+              setFilters((f) => ({
+                ...f,
+                minCap: e.target.value,
+              }))
+            }
+            className={`w-full px-4 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
+          />
+
+          <input
+            type="number"
+            placeholder="Max capacity"
+            value={filters.maxCap}
+            onChange={(e) =>
+              setFilters((f) => ({
+                ...f,
+                maxCap: e.target.value,
+              }))
+            }
+            className={`w-full px-4 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
+          />
+
+          <select
+            value={filters.hasEquip}
+            onChange={(e) =>
+              setFilters((f) => ({
+                ...f,
+                hasEquip: e.target.value,
+              }))
+            }
+            className={`w-full px-4 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all appearance-none`}
+          >
+            <option>All</option>
+            <option>Yes</option>
+            <option>No</option>
+          </select>
+        </div>
+      </motion.section>
+
+      {/* Rooms Table */}
+      <motion.section
+        className={`rounded-2xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm overflow-hidden shadow-sm`}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+      >
+        <div
+          className={`p-5 border-b ${theme.cardBorder} flex justify-between items-center`}
+        >
+          <h2 className="text-base font-bold flex items-center gap-2">
+            <ClipboardList
+              size={18}
+              className={isDark ? "text-indigo-600" : "text-indigo-400"}
+            />
+            Room Inventory
+          </h2>
+          <span
+            className={`px-3 py-1 text-xs rounded-lg font-semibold ${theme.accentBg} border ${theme.accentBorder}`}
+          >
+            {filtered.length} rooms
+          </span>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead className={theme.tableHeader}>
+              <tr>
+                {[
+                  "Room",
+                  "Type",
+                  "Capacity",
+                  "Equipment",
+                  "Notes",
+                  "Status",
+                ].map((h) => (
+                  <th
+                    key={h}
+                    className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b ${theme.tableBorder}`}
+                  >
+                    {h}
+                  </th>
                 ))}
-              </select>
-            </div>
-
-            <input
-              type="number"
-              placeholder="Min capacity"
-              value={filters.minCap}
-              onChange={(e) =>
-                setFilters((f) => ({
-                  ...f,
-                  minCap: e.target.value,
-                }))
-              }
-              className="w-full rounded-lg border border-slate-700 bg-slate-800/70 px-4 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-            />
-
-            <input
-              type="number"
-              placeholder="Max capacity"
-              value={filters.maxCap}
-              onChange={(e) =>
-                setFilters((f) => ({
-                  ...f,
-                  maxCap: e.target.value,
-                }))
-              }
-              className="w-full rounded-lg border border-slate-700 bg-slate-800/70 px-4 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-            />
-
-            <div className="relative">
-              <select
-                value={filters.hasEquip}
-                onChange={(e) =>
-                  setFilters((f) => ({
-                    ...f,
-                    hasEquip: e.target.value,
-                  }))
-                }
-                className="w-full appearance-none rounded-lg border border-slate-700 bg-slate-800/70 pl-4 pr-10 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-                style={{
-                  backgroundImage:
-                    'url("data:image/svg+xml;utf8,<svg xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"0 0 20 20\\" fill=\\"%2394a3b8\\"><path fill-rule=\\"evenodd\\" d=\\"M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z\\" clip-rule=\\"evenodd\\"/></svg>")',
-                  backgroundRepeat: "no-repeat",
-                  backgroundPosition: "right 0.75rem center",
-                  backgroundSize: "1.25rem 1.25rem",
-                }}
-              >
-                <option>All</option>
-                <option>Yes</option>
-                <option>No</option>
-              </select>
-            </div>
-          </div>
-        </section>
-
-        {/* Rooms Table */}
-        <section className="rounded-xl border border-slate-800 bg-slate-900/60 overflow-hidden shadow-lg backdrop-blur-sm">
-          <div className="p-5 border-b border-slate-800 flex justify-between items-center">
-            <h2 className="text-base font-bold flex items-center gap-2">
-              <ClipboardListIcon size={18} className="text-indigo-400" />
-              <span>Room Inventory</span>
-              <span className="ml-2 px-2 py-0.5 text-xs rounded-full bg-slate-800 text-slate-300">
-                {filtered.length} rooms
-              </span>
-            </h2>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
-              <caption className="sr-only">
-                Room inventory with capacities, types, and equipment
-              </caption>
-              <thead className="text-slate-300 bg-slate-800/50">
-                <tr>
-                  {[
-                    "Room",
-                    "Type",
-                    "Capacity",
-                    "Equipment",
-                    "Notes",
-                    "Blackouts",
-                  ].map((h) => (
-                    <th
-                      key={h}
-                      scope="col"
-                      className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider"
-                    >
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800">
-                {filtered.length > 0 ? (
-                  filtered.map((r) => (
-                    <tr
-                      key={r.id}
-                      className="hover:bg-slate-800/40 transition-colors"
-                    >
-                      <td className="px-4 py-3.5 text-white font-medium">
-                        {r.name}
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <span
-                          className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${
-                            ROOM_TYPE_COLORS[r.type]
-                          }`}
-                        >
-                          {ROOM_TYPE_ICONS[r.type]}
-                          {r.type}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <div className="flex items-center gap-2">
-                          <UsersIcon size={14} className="text-slate-400" />
-                          <span className="font-mono font-semibold">
-                            {r.capacity}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3.5 break-words max-w-xs">
-                        {r.equipment.length > 0 ? (
-                          <div className="flex flex-wrap gap-1">
-                            {r.equipment.map((eq) => (
-                              <span
-                                key={eq}
-                                className="inline-flex items-center rounded-full bg-slate-800/70 px-2 py-0.5 text-xs"
-                              >
-                                {eq}
-                              </span>
-                            ))}
-                          </div>
-                        ) : (
-                          <span className="text-slate-400">—</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3.5 max-w-xs">
-                        {r.availabilityNote ? (
-                          <span className="text-xs text-slate-400">
-                            {r.availabilityNote}
-                          </span>
-                        ) : (
-                          <span className="text-slate-400">—</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <span
-                          className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${
-                            r.blackouts.length === 0
-                              ? "bg-green-500/20 text-green-300 border-green-400/40"
-                              : "bg-amber-500/20 text-amber-300 border-amber-400/40"
-                          }`}
-                        >
-                          {r.blackouts.length === 0 ? (
-                            <CheckCircleIcon size={14} />
-                          ) : (
-                            <AlertTriangleIcon size={14} />
-                          )}
-                          {r.blackouts.length}
-                        </span>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td
-                      colSpan={6}
-                      className="px-4 py-8 text-center text-slate-400"
-                    >
-                      <div className="flex flex-col items-center justify-center gap-2">
-                        <AlertTriangleIcon
-                          size={24}
-                          className="text-slate-500"
-                        />
-                        <p>
-                          No rooms match your filters. Try adjusting your
-                          criteria.
-                        </p>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.length > 0 ? (
+                filtered.map((r, idx) => (
+                  <motion.tr
+                    key={r.id}
+                    className={`border-b ${theme.tableBorder} ${theme.hoverBg} transition-colors`}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: idx * 0.05 }}
+                  >
+                    <td className="px-4 py-4 font-semibold">{r.name}</td>
+                    <td className="px-4 py-4">
+                      <span
+                        className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium ${getRoomTypeColor(
+                          r.type
+                        )}`}
+                      >
+                        {getRoomTypeIcon(r.type)}
+                        {r.type}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="flex items-center gap-2">
+                        <Users size={14} className={theme.mutedText} />
+                        <span className="font-semibold">{r.capacity}</span>
                       </div>
                     </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </main>
+                    <td className="px-4 py-4">
+                      {r.equipment.length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {r.equipment.map((eq) => (
+                            <span
+                              key={eq}
+                              className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium ${theme.accentBg} border ${theme.accentBorder}`}
+                            >
+                              {eq}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className={theme.mutedText}>—</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-4 max-w-xs">
+                      {r.availabilityNote ? (
+                        <span className={`text-xs ${theme.mutedText}`}>
+                          {r.availabilityNote}
+                        </span>
+                      ) : (
+                        <span className={theme.mutedText}>—</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-4">
+                      <span
+                        className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium ${
+                          r.blackouts.length === 0
+                            ? isDark
+                              ? "bg-emerald-100 text-emerald-700 border-emerald-200"
+                              : "bg-emerald-500/20 text-emerald-300 border-emerald-400/40"
+                            : isDark
+                            ? "bg-amber-100 text-amber-700 border-amber-200"
+                            : "bg-amber-500/20 text-amber-300 border-amber-400/40"
+                        }`}
+                      >
+                        {r.blackouts.length === 0 ? (
+                          <>
+                            <CheckCircle size={14} />
+                            Available
+                          </>
+                        ) : (
+                          <>
+                            <AlertTriangle size={14} />
+                            {r.blackouts.length} blackout
+                            {r.blackouts.length > 1 ? "s" : ""}
+                          </>
+                        )}
+                      </span>
+                    </td>
+                  </motion.tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={6}
+                    className={`px-4 py-12 text-center ${theme.mutedText}`}
+                  >
+                    <div className="flex flex-col items-center justify-center gap-3">
+                      <AlertTriangle size={32} className="opacity-50" />
+                      <p className="text-sm">
+                        No rooms match your filters. Try adjusting your
+                        criteria.
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </motion.section>
     </div>
   );
 }

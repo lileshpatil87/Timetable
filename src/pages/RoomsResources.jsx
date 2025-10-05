@@ -1,47 +1,39 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  PlusIcon,
-  SearchIcon,
-  FilterIcon,
-  TrashIcon,
-  EditIcon,
-  XIcon,
-  SaveIcon,
-  BuildingIcon,
-  LayoutGridIcon,
-  UsersIcon,
-  ClipboardListIcon,
-  AlertTriangleIcon,
-  CheckCircleIcon,
-  ClockIcon,
-  MapPinIcon,
-  BarChartIcon,
-  PlusCircleIcon,
-  CalendarIcon,
-  GraduationCapIcon,
+  Plus,
+  Search,
+  Filter,
+  Trash2,
+  Edit,
+  X,
+  Save,
+  Building2,
+  LayoutGrid,
+  Users,
+  ClipboardList,
+  AlertTriangle,
+  CheckCircle,
+  Clock,
+  MapPin,
+  PlusCircle,
+  Calendar,
+  Monitor,
+  Sun,
+  Moon,
 } from "lucide-react";
+
 const TYPES = ["Lecture", "Lab", "Studio"];
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"];
 const SLOTS = ["09:00", "10:00", "11:00", "12:00", "14:00", "15:00", "16:00"];
-// Room type colors
-const ROOM_TYPE_COLORS = {
-  Lecture: "bg-blue-500/20 text-blue-300 border-blue-400/40",
-  Lab: "bg-green-500/20 text-green-300 border-green-400/40",
-  Studio: "bg-purple-500/20 text-purple-300 border-purple-400/40",
-};
-// Room type icons
-const ROOM_TYPE_ICONS = {
-  Lecture: <LayoutGridIcon size={14} />,
-  Lab: <BuildingIcon size={14} />,
-  Studio: <CalendarIcon size={14} />,
-};
+
 const seedRooms = [
   {
     id: "R-A204",
     name: "A-204",
     type: "Lecture",
     capacity: 120,
-    equipment: ["Projector"],
+    equipment: ["Projector", "Audio System"],
     availabilityNote: "",
     blackouts: [
       {
@@ -56,7 +48,7 @@ const seedRooms = [
     name: "B-101",
     type: "Lecture",
     capacity: 80,
-    equipment: [],
+    equipment: ["Whiteboard"],
     availabilityNote: "",
     blackouts: [],
   },
@@ -65,7 +57,7 @@ const seedRooms = [
     name: "Lab-2",
     type: "Lab",
     capacity: 30,
-    equipment: ["PCs", "LAN"],
+    equipment: ["PCs", "LAN", "Projector"],
     availabilityNote: "Preferred for CS labs",
     blackouts: [
       {
@@ -80,16 +72,18 @@ const seedRooms = [
     name: "Studio-1",
     type: "Studio",
     capacity: 40,
-    equipment: ["Recording"],
+    equipment: ["Recording Equipment", "Soundproofing"],
     availabilityNote: "",
     blackouts: [],
   },
 ];
+
 function loadState() {
   const r = localStorage.getItem("rooms");
   return r ? JSON.parse(r) : seedRooms;
 }
-export default function RoomsResources() {
+
+export default function RoomsResources({ theme, isDark }) {
   const [rooms, setRooms] = useState(loadState());
   const [filters, setFilters] = useState({
     q: "",
@@ -102,9 +96,11 @@ export default function RoomsResources() {
   const [edit, setEdit] = useState(null);
   const [isCreating, setIsCreating] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+
   useEffect(() => {
     localStorage.setItem("rooms", JSON.stringify(rooms));
   }, [rooms]);
+
   const filtered = useMemo(() => {
     return rooms.filter((r) => {
       const q = filters.q.trim().toLowerCase();
@@ -122,11 +118,13 @@ export default function RoomsResources() {
       return okQ && okT && okMin && okMax && okEq;
     });
   }, [rooms, filters]);
+
   const openEdit = (room) => {
     setSelected(room);
     setEdit(JSON.parse(JSON.stringify(room)));
     setIsCreating(false);
   };
+
   const openCreate = () => {
     const newRoom = {
       id: `R-${Date.now()}`,
@@ -141,15 +139,18 @@ export default function RoomsResources() {
     setEdit(newRoom);
     setIsCreating(true);
   };
+
   const confirmDelete = (room) => {
     setDeleteConfirm(room);
   };
+
   const deleteRoom = () => {
     if (deleteConfirm) {
       setRooms((list) => list.filter((r) => r.id !== deleteConfirm.id));
       setDeleteConfirm(null);
     }
   };
+
   const addEquipment = (val) => {
     const v = val.trim();
     if (!v) return;
@@ -158,12 +159,14 @@ export default function RoomsResources() {
       equipment: Array.from(new Set([...(e.equipment || []), v])),
     }));
   };
+
   const removeEquipment = (val) => {
     setEdit((e) => ({
       ...e,
       equipment: (e.equipment || []).filter((x) => x !== val),
     }));
   };
+
   const addBlackout = () => {
     setEdit((e) => ({
       ...e,
@@ -177,6 +180,7 @@ export default function RoomsResources() {
       ],
     }));
   };
+
   const updateBlackout = (i, key, val) => {
     setEdit((e) => {
       const arr = [...e.blackouts];
@@ -190,6 +194,7 @@ export default function RoomsResources() {
       };
     });
   };
+
   const removeBlackout = (i) => {
     setEdit((e) => {
       const arr = [...e.blackouts];
@@ -200,6 +205,7 @@ export default function RoomsResources() {
       };
     });
   };
+
   const save = () => {
     const errs = [];
     if (!edit.name.trim()) errs.push("Name is required.");
@@ -223,272 +229,320 @@ export default function RoomsResources() {
     setEdit(null);
     setIsCreating(false);
   };
+
+  const getRoomTypeColor = (type) => {
+    if (type === "Lecture") {
+      return isDark
+        ? "bg-blue-100 text-blue-700 border-blue-200"
+        : "bg-blue-500/20 text-blue-300 border-blue-400/40";
+    }
+    if (type === "Lab") {
+      return isDark
+        ? "bg-emerald-100 text-emerald-700 border-emerald-200"
+        : "bg-emerald-500/20 text-emerald-300 border-emerald-400/40";
+    }
+    return isDark
+      ? "bg-purple-100 text-purple-700 border-purple-200"
+      : "bg-purple-500/20 text-purple-300 border-purple-400/40";
+  };
+
+  const getRoomTypeIcon = (type) => {
+    if (type === "Lecture") return <LayoutGrid size={14} />;
+    if (type === "Lab") return <Monitor size={14} />;
+    return <Building2 size={14} />;
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 to-slate-900 text-slate-100">
-      
-      {/* Page Header */}
-      <div className="max-w-[1280px] mx-auto px-6 pb-6">
-        <h1 className="text-3xl font-extrabold mb-3 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-          Rooms & Resources
-        </h1>
-        <p className="text-slate-400">
-          Manage capacities, types, equipment, and blackout windows with an
-          at‑a‑glance utilization preview.
-        </p>
-      </div>
-      <main className="max-w-[1280px] mx-auto px-6 pb-16 space-y-6">
-        {/* Filters */}
-        <section
-          className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 shadow-lg backdrop-blur-sm"
-          aria-labelledby="filters-title"
-        >
-          <h2
-            id="filters-title"
-            className="text-base font-bold mb-4 flex items-center gap-2"
+    <div className="space-y-6">
+      {/* Filters */}
+      <motion.section
+        className={`rounded-2xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm p-6 shadow-sm`}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <h2 className="text-base font-bold mb-4 flex items-center gap-2">
+          <Filter
+            size={18}
+            className={isDark ? "text-indigo-600" : "text-indigo-400"}
+          />
+          Filter Rooms
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="relative">
+            <Search
+              size={16}
+              className={`absolute left-3 top-1/2 -translate-y-1/2 ${theme.mutedText}`}
+            />
+            <input
+              type="search"
+              placeholder="Room name"
+              value={filters.q}
+              onChange={(e) =>
+                setFilters((f) => ({
+                  ...f,
+                  q: e.target.value,
+                }))
+              }
+              className={`w-full pl-10 pr-4 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
+            />
+          </div>
+
+          <select
+            value={filters.type}
+            onChange={(e) =>
+              setFilters((f) => ({
+                ...f,
+                type: e.target.value,
+              }))
+            }
+            className={`w-full px-4 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all appearance-none`}
           >
-            <FilterIcon size={18} className="text-indigo-400" />
-            <span>Filter Rooms</span>
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-500">
-                <SearchIcon size={16} />
-              </div>
-              <input
-                type="search"
-                placeholder="Room name"
-                value={filters.q}
-                onChange={(e) =>
-                  setFilters((f) => ({
-                    ...f,
-                    q: e.target.value,
-                  }))
-                }
-                className="w-full rounded-lg border border-slate-700 bg-slate-800/70 pl-10 pr-4 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-              />
-            </div>
-            <div className="relative">
-              <select
-                value={filters.type}
-                onChange={(e) =>
-                  setFilters((f) => ({
-                    ...f,
-                    type: e.target.value,
-                  }))
-                }
-                className="w-full appearance-none rounded-lg border border-slate-700 bg-slate-800/70 pl-4 pr-10 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-              >
-                <option>All</option>
-                {TYPES.map((t) => (
-                  <option key={t}>{t}</option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
-                <LayoutGridIcon size={16} />
-              </div>
-            </div>
-            <div className="relative">
-              <input
-                type="number"
-                placeholder="Min capacity"
-                value={filters.minCap}
-                onChange={(e) =>
-                  setFilters((f) => ({
-                    ...f,
-                    minCap: e.target.value,
-                  }))
-                }
-                className="w-full rounded-lg border border-slate-700 bg-slate-800/70 px-4 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-              />
-            </div>
-            <div className="relative">
-              <input
-                type="number"
-                placeholder="Max capacity"
-                value={filters.maxCap}
-                onChange={(e) =>
-                  setFilters((f) => ({
-                    ...f,
-                    maxCap: e.target.value,
-                  }))
-                }
-                className="w-full rounded-lg border border-slate-700 bg-slate-800/70 px-4 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-              />
-            </div>
-            <div className="relative">
-              <select
-                value={filters.hasEquip}
-                onChange={(e) =>
-                  setFilters((f) => ({
-                    ...f,
-                    hasEquip: e.target.value,
-                  }))
-                }
-                className="w-full appearance-none rounded-lg border border-slate-700 bg-slate-800/70 pl-4 pr-10 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-              >
-                <option>All</option>
-                <option>Yes</option>
-                <option>No</option>
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
-                <MapPinIcon size={16} />
-              </div>
-            </div>
-          </div>
-        </section>
-        {/* Rooms Table */}
-        <section className="rounded-xl border border-slate-800 bg-slate-900/60 overflow-hidden shadow-lg backdrop-blur-sm">
-          <div className="p-5 border-b border-slate-800 flex justify-between items-center">
+            <option>All</option>
+            {TYPES.map((t) => (
+              <option key={t}>{t}</option>
+            ))}
+          </select>
+
+          <input
+            type="number"
+            placeholder="Min capacity"
+            value={filters.minCap}
+            onChange={(e) =>
+              setFilters((f) => ({
+                ...f,
+                minCap: e.target.value,
+              }))
+            }
+            className={`w-full px-4 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
+          />
+
+          <input
+            type="number"
+            placeholder="Max capacity"
+            value={filters.maxCap}
+            onChange={(e) =>
+              setFilters((f) => ({
+                ...f,
+                maxCap: e.target.value,
+              }))
+            }
+            className={`w-full px-4 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
+          />
+
+          <select
+            value={filters.hasEquip}
+            onChange={(e) =>
+              setFilters((f) => ({
+                ...f,
+                hasEquip: e.target.value,
+              }))
+            }
+            className={`w-full px-4 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all appearance-none`}
+          >
+            <option>All</option>
+            <option>Yes</option>
+            <option>No</option>
+          </select>
+        </div>
+      </motion.section>
+
+      {/* Rooms Table */}
+      <motion.section
+        className={`rounded-2xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm overflow-hidden shadow-sm`}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+      >
+        <div
+          className={`p-5 border-b ${theme.cardBorder} flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4`}
+        >
+          <div className="flex items-center gap-3">
             <h2 className="text-base font-bold flex items-center gap-2">
-              <ClipboardListIcon size={18} className="text-indigo-400" />
-              <span>Room Inventory</span>
-              <span className="ml-2 px-2 py-0.5 text-xs rounded-full bg-slate-800 text-slate-300">
-                {filtered.length} rooms
-              </span>
+              <ClipboardList
+                size={18}
+                className={isDark ? "text-indigo-600" : "text-indigo-400"}
+              />
+              Room Inventory
             </h2>
-            <button
-              onClick={openCreate}
-              className="px-4 py-2 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-sm font-medium shadow-lg shadow-indigo-900/30 hover:from-indigo-600 hover:to-purple-600 transition-all flex items-center gap-2"
-              aria-label="Add new room"
+            <span
+              className={`px-2.5 py-1 text-xs rounded-lg font-semibold ${theme.accentBg} border ${theme.accentBorder}`}
             >
-              <PlusCircleIcon size={16} />
-              <span>New Room</span>
-            </button>
+              {filtered.length} rooms
+            </span>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
-              <caption className="sr-only">
-                Room inventory with capacities, types, and equipment
-              </caption>
-              <thead className="text-slate-300 bg-slate-800/50">
-                <tr>
-                  {[
-                    "Room",
-                    "Type",
-                    "Capacity",
-                    "Equipment",
-                    "Blackouts",
-                    "Actions",
-                  ].map((h) => (
-                    <th
-                      key={h}
-                      scope="col"
-                      className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider"
-                    >
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800">
-                {filtered.length > 0 ? (
-                  filtered.map((r) => (
-                    <tr
-                      key={r.id}
-                      className="hover:bg-slate-800/40 transition-colors"
-                    >
-                      <td className="px-4 py-3.5 text-white font-medium">
-                        {r.name}
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <span
-                          className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${
-                            ROOM_TYPE_COLORS[r.type]
-                          }`}
-                        >
-                          {ROOM_TYPE_ICONS[r.type]}
-                          {r.type}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <span className="flex items-center justify-center w-7 h-7 rounded-full bg-slate-800 text-white font-medium">
-                          {r.capacity}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3.5 break-words">
-                        {r.equipment.length > 0 ? (
-                          <div className="flex flex-wrap gap-1">
-                            {r.equipment.map((eq) => (
-                              <span
-                                key={eq}
-                                className="inline-flex items-center rounded-full bg-slate-800/70 px-2 py-0.5 text-xs"
-                              >
-                                {eq}
-                              </span>
-                            ))}
-                          </div>
-                        ) : (
-                          <span className="text-slate-400">—</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <span
-                          className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${
-                            r.blackouts.length === 0
-                              ? "bg-green-500/20 text-green-300 border-green-400/40"
-                              : "bg-amber-500/20 text-amber-300 border-amber-400/40"
-                          }`}
-                        >
-                          {r.blackouts.length === 0 ? (
-                            <CheckCircleIcon size={14} />
-                          ) : (
-                            <AlertTriangleIcon size={14} />
-                          )}
-                          {r.blackouts.length}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <div className="flex gap-2">
-                          <button
-                            className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-400/40 px-3 py-1.5 text-xs font-medium transition-colors"
-                            onClick={() => openEdit(r)}
-                            aria-haspopup="dialog"
-                            title="Edit room"
-                          >
-                            <EditIcon size={14} />
-                            Edit
-                          </button>
-                          <button
-                            className="inline-flex items-center gap-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-400/40 px-3 py-1.5 text-xs font-medium transition-colors"
-                            onClick={() => confirmDelete(r)}
-                            aria-haspopup="dialog"
-                            title="Delete room"
-                          >
-                            <TrashIcon size={14} />
-                            Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td
-                      colSpan={6}
-                      className="px-4 py-8 text-center text-slate-400"
-                    >
-                      <div className="flex flex-col items-center justify-center gap-2">
-                        <AlertTriangleIcon
-                          size={24}
-                          className="text-slate-500"
-                        />
-                        <p>
-                          No rooms match your filters. Try adjusting your
-                          criteria or add a new room.
-                        </p>
+          <motion.button
+            onClick={openCreate}
+            className={`px-4 py-2.5 rounded-lg bg-gradient-to-r ${theme.gradient} text-white text-sm font-semibold shadow-lg hover:shadow-xl transition-all flex items-center gap-2`}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <PlusCircle size={16} />
+            New Room
+          </motion.button>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead className={theme.tableHeader}>
+              <tr>
+                {[
+                  "Room",
+                  "Type",
+                  "Capacity",
+                  "Equipment",
+                  "Status",
+                  "Actions",
+                ].map((h) => (
+                  <th
+                    key={h}
+                    className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider border-b ${theme.tableBorder}`}
+                  >
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.length > 0 ? (
+                filtered.map((r, idx) => (
+                  <motion.tr
+                    key={r.id}
+                    className={`border-b ${theme.tableBorder} ${theme.hoverBg} transition-colors`}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: idx * 0.05 }}
+                  >
+                    <td className="px-4 py-4 font-semibold">{r.name}</td>
+                    <td className="px-4 py-4">
+                      <span
+                        className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-semibold ${getRoomTypeColor(
+                          r.type
+                        )}`}
+                      >
+                        {getRoomTypeIcon(r.type)}
+                        {r.type}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="flex items-center gap-2">
+                        <Users size={14} className={theme.mutedText} />
+                        <span className="font-semibold">{r.capacity}</span>
                       </div>
                     </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </section>
-        {/* Edit/Create Drawer */}
+                    <td className="px-4 py-4">
+                      {r.equipment.length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {r.equipment.slice(0, 2).map((eq) => (
+                            <span
+                              key={eq}
+                              className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium ${theme.accentBg} border ${theme.accentBorder}`}
+                            >
+                              {eq}
+                            </span>
+                          ))}
+                          {r.equipment.length > 2 && (
+                            <span
+                              className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium ${theme.accentBg} border ${theme.accentBorder}`}
+                            >
+                              +{r.equipment.length - 2}
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className={theme.mutedText}>—</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-4">
+                      <span
+                        className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-semibold ${
+                          r.blackouts.length === 0
+                            ? isDark
+                              ? "bg-emerald-100 text-emerald-700 border-emerald-200"
+                              : "bg-emerald-500/20 text-emerald-300 border-emerald-400/40"
+                            : isDark
+                            ? "bg-amber-100 text-amber-700 border-amber-200"
+                            : "bg-amber-500/20 text-amber-300 border-amber-400/40"
+                        }`}
+                      >
+                        {r.blackouts.length === 0 ? (
+                          <>
+                            <CheckCircle size={14} />
+                            Available
+                          </>
+                        ) : (
+                          <>
+                            <AlertTriangle size={14} />
+                            {r.blackouts.length} blackout
+                            {r.blackouts.length > 1 ? "s" : ""}
+                          </>
+                        )}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="flex gap-2">
+                        <motion.button
+                          className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium border ${
+                            isDark
+                              ? "bg-indigo-100 text-indigo-700 border-indigo-200 hover:bg-indigo-200"
+                              : "bg-indigo-500/20 text-indigo-300 border-indigo-400/40 hover:bg-indigo-500/30"
+                          } transition-colors`}
+                          onClick={() => openEdit(r)}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <Edit size={14} />
+                          Edit
+                        </motion.button>
+                        <motion.button
+                          className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium border ${
+                            isDark
+                              ? "bg-rose-100 text-rose-700 border-rose-200 hover:bg-rose-200"
+                              : "bg-rose-500/20 text-rose-300 border-rose-400/40 hover:bg-rose-500/30"
+                          } transition-colors`}
+                          onClick={() => confirmDelete(r)}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <Trash2 size={14} />
+                          Delete
+                        </motion.button>
+                      </div>
+                    </td>
+                  </motion.tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={6}
+                    className={`px-4 py-12 text-center ${theme.mutedText}`}
+                  >
+                    <div className="flex flex-col items-center justify-center gap-3">
+                      <AlertTriangle size={32} className="opacity-50" />
+                      <p className="text-sm">
+                        No rooms match your filters. Try adjusting your criteria
+                        or add a new room.
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </motion.section>
+
+      {/* Edit/Create Modal */}
+      <AnimatePresence>
         {edit && (
-          <div className="fixed inset-0 z-50 overflow-hidden">
+          <motion.div
+            className="fixed inset-0 z-50 overflow-hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
             <div
-              className="absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity"
+              className={`absolute inset-0 ${theme.modalOverlay} backdrop-blur-sm`}
               onClick={() => {
                 setSelected(null);
                 setEdit(null);
@@ -496,34 +550,57 @@ export default function RoomsResources() {
               }}
             />
             <div className="fixed inset-y-0 right-0 max-w-full flex">
-              <div className="w-screen max-w-2xl animate-fadeIn">
-                <div className="h-full flex flex-col rounded-l-2xl border border-slate-700 bg-slate-900 shadow-xl">
-                  <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800">
+              <motion.div
+                className="w-screen max-w-2xl"
+                initial={{ x: "100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "100%" }}
+                transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              >
+                <div
+                  className={`h-full flex flex-col rounded-l-2xl border ${theme.cardBorder} ${theme.modalBg} shadow-2xl`}
+                >
+                  <div
+                    className={`flex items-center justify-between px-6 py-4 border-b ${theme.cardBorder}`}
+                  >
                     <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-400">
-                          <BuildingIcon size={16} />
-                        </span>
+                      <div className="flex items-center gap-3 mb-1">
+                        <div
+                          className={`p-2 rounded-lg ${
+                            isDark ? "bg-indigo-100" : "bg-indigo-500/20"
+                          }`}
+                        >
+                          <Building2
+                            size={18}
+                            className={
+                              isDark ? "text-indigo-600" : "text-indigo-400"
+                            }
+                          />
+                        </div>
                         <h2 className="text-lg font-bold">
-                          {isCreating ? "Add New Room" : edit.name}
+                          {isCreating ? "Add New Room" : `Edit ${edit.name}`}
                         </h2>
                       </div>
                       {!isCreating && (
-                        <p className="text-slate-300">{edit.type} Room</p>
+                        <p className={`text-sm ${theme.mutedText} ml-11`}>
+                          {edit.type} Room • Capacity: {edit.capacity}
+                        </p>
                       )}
                     </div>
-                    <button
+                    <motion.button
                       onClick={() => {
                         setSelected(null);
                         setEdit(null);
                         setIsCreating(false);
                       }}
-                      className="flex items-center justify-center h-8 w-8 rounded-lg hover:bg-slate-800/70 text-slate-400 hover:text-white transition-colors"
-                      aria-label="Close"
+                      className={`p-2 rounded-lg ${theme.hoverBg} transition-colors`}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
                     >
-                      <XIcon size={18} />
-                    </button>
+                      <X size={18} />
+                    </motion.button>
                   </div>
+
                   <div className="flex-1 overflow-y-auto p-6 space-y-6">
                     <form
                       onSubmit={(e) => {
@@ -533,8 +610,10 @@ export default function RoomsResources() {
                       className="space-y-6"
                     >
                       {/* Properties */}
-                      <fieldset className="rounded-xl border border-slate-700 p-5 grid gap-5 bg-slate-800/20">
-                        <legend className="px-2 text-sm font-medium text-slate-300">
+                      <fieldset
+                        className={`rounded-xl border ${theme.cardBorder} p-5 ${theme.accentBg}`}
+                      >
+                        <legend className="px-2 text-sm font-semibold mb-4">
                           Room Properties
                         </legend>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -547,19 +626,19 @@ export default function RoomsResources() {
                                 name: v,
                               })
                             }
-                            icon={
-                              <BuildingIcon
-                                size={16}
-                                className="text-slate-400"
-                              />
-                            }
+                            icon={<Building2 size={16} />}
+                            theme={theme}
                             required
                           />
                           <div className="space-y-1.5">
-                            <label className="block text-sm font-medium text-slate-300">
+                            <label className="block text-sm font-semibold">
                               Room Type
                             </label>
                             <div className="relative">
+                              <LayoutGrid
+                                size={16}
+                                className={`absolute left-3 top-1/2 -translate-y-1/2 ${theme.mutedText}`}
+                              />
                               <select
                                 value={edit.type}
                                 onChange={(e) =>
@@ -568,30 +647,12 @@ export default function RoomsResources() {
                                     type: e.target.value,
                                   })
                                 }
-                                className="w-full appearance-none rounded-lg border border-slate-700 bg-slate-800/70 pl-10 pr-10 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
+                                className={`w-full pl-10 pr-4 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all appearance-none`}
                               >
                                 {TYPES.map((t) => (
                                   <option key={t}>{t}</option>
                                 ))}
                               </select>
-                              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                                <LayoutGridIcon size={16} />
-                              </div>
-                              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500">
-                                <svg
-                                  className="h-4 w-4"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M19 9l-7 7-7-7"
-                                  />
-                                </svg>
-                              </div>
                             </div>
                           </div>
                           <LabeledNumber
@@ -603,9 +664,8 @@ export default function RoomsResources() {
                                 capacity: Number(v),
                               })
                             }
-                            icon={
-                              <UsersIcon size={16} className="text-slate-400" />
-                            }
+                            icon={<Users size={16} />}
+                            theme={theme}
                           />
                           <LabeledInput
                             label="Availability Note"
@@ -616,30 +676,30 @@ export default function RoomsResources() {
                                 availabilityNote: v,
                               })
                             }
-                            icon={
-                              <ClipboardListIcon
-                                size={16}
-                                className="text-slate-400"
-                              />
-                            }
+                            icon={<ClipboardList size={16} />}
+                            theme={theme}
                             placeholder="Optional context"
                           />
                         </div>
                       </fieldset>
+
                       {/* Equipment */}
-                      <fieldset className="rounded-xl border border-slate-700 p-5 bg-slate-800/20">
-                        <legend className="px-2 text-sm font-medium text-slate-300">
+                      <fieldset
+                        className={`rounded-xl border ${theme.cardBorder} p-5 ${theme.accentBg}`}
+                      >
+                        <legend className="px-2 text-sm font-semibold mb-4">
                           Equipment
                         </legend>
                         <div className="space-y-4">
                           <div className="flex gap-2">
                             <div className="relative flex-1">
-                              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                                <MapPinIcon size={16} />
-                              </div>
+                              <MapPin
+                                size={16}
+                                className={`absolute left-3 top-1/2 -translate-y-1/2 ${theme.mutedText}`}
+                              />
                               <input
                                 id="equipAdd"
-                                className="w-full rounded-lg border border-slate-700 bg-slate-800/70 pl-10 pr-4 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
+                                className={`w-full pl-10 pr-4 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
                                 placeholder="Add equipment tag"
                                 onKeyDown={(e) => {
                                   if (e.key === "Enter") {
@@ -650,9 +710,9 @@ export default function RoomsResources() {
                                 }}
                               />
                             </div>
-                            <button
+                            <motion.button
                               type="button"
-                              className="px-4 py-2 rounded-lg border border-slate-700 hover:bg-slate-800 transition-colors flex items-center gap-1"
+                              className={`px-4 py-2.5 rounded-lg border ${theme.buttonBorder} ${theme.buttonBg} ${theme.buttonText} text-sm font-medium transition-colors flex items-center gap-2`}
                               onClick={() => {
                                 const el = document.getElementById("equipAdd");
                                 if (el && el.value.trim()) {
@@ -660,284 +720,261 @@ export default function RoomsResources() {
                                   el.value = "";
                                 }
                               }}
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
                             >
-                              <PlusIcon size={16} />
+                              <Plus size={16} />
                               Add
-                            </button>
+                            </motion.button>
                           </div>
                           <div className="flex flex-wrap gap-2 min-h-[40px]">
                             {(edit.equipment || []).length > 0 ? (
                               edit.equipment.map((tag) => (
-                                <span
+                                <motion.span
                                   key={tag}
-                                  className="inline-flex items-center gap-2 rounded-full bg-slate-800/70 border border-slate-700 px-3 py-1"
+                                  className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium border ${theme.accentBorder} ${theme.accentBg}`}
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: 1 }}
+                                  exit={{ scale: 0 }}
                                 >
                                   {tag}
                                   <button
                                     type="button"
-                                    aria-label={`Remove ${tag}`}
                                     onClick={() => removeEquipment(tag)}
-                                    className="text-slate-400 hover:text-slate-100"
+                                    className={`${theme.mutedText} hover:text-current`}
                                   >
-                                    <XIcon size={14} />
+                                    <X size={14} />
                                   </button>
-                                </span>
+                                </motion.span>
                               ))
                             ) : (
-                              <span className="text-slate-400 text-sm">
-                                No equipment added yet. Add equipment tags
-                                above.
+                              <span className={`text-sm ${theme.mutedText}`}>
+                                No equipment added yet
                               </span>
                             )}
                           </div>
                         </div>
                       </fieldset>
+
                       {/* Blackout windows */}
-                      <fieldset className="rounded-xl border border-slate-700 p-5 bg-slate-800/20">
-                        <legend className="px-2 text-sm font-medium text-slate-300">
+                      <fieldset
+                        className={`rounded-xl border ${theme.cardBorder} p-5 ${theme.accentBg}`}
+                      >
+                        <legend className="px-2 text-sm font-semibold mb-2">
                           Blackout Windows
                         </legend>
-                        <p className="text-sm text-slate-400 mb-4">
-                          Add day/slot blocks for maintenance or events to
-                          prevent scheduling then.
+                        <p className={`text-sm ${theme.mutedText} mb-4`}>
+                          Block specific time slots for maintenance or special
+                          events
                         </p>
-                        <div className="space-y-4">
+                        <div className="space-y-3">
                           {(edit.blackouts || []).length > 0 ? (
                             edit.blackouts.map((b, i) => (
-                              <div
+                              <motion.div
                                 key={i}
-                                className="grid grid-cols-1 md:grid-cols-4 gap-3 items-end border border-slate-800 rounded-lg p-3 bg-slate-800/30"
+                                className={`grid grid-cols-1 md:grid-cols-4 gap-3 items-end border ${theme.cardBorder} rounded-lg p-3 ${theme.accentBg}`}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: 20 }}
                               >
                                 <div className="space-y-1.5">
-                                  <label className="block text-sm font-medium text-slate-300">
+                                  <label className="block text-sm font-medium">
                                     Day
                                   </label>
-                                  <div className="relative">
-                                    <select
-                                      className="w-full appearance-none rounded-lg border border-slate-700 bg-slate-800/70 pl-10 pr-10 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-                                      value={b.day}
-                                      onChange={(e) =>
-                                        updateBlackout(i, "day", e.target.value)
-                                      }
-                                    >
-                                      <option value="">Select</option>
-                                      {DAYS.map((d) => (
-                                        <option key={d} value={d}>
-                                          {d}
-                                        </option>
-                                      ))}
-                                    </select>
-                                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                                      <CalendarIcon size={16} />
-                                    </div>
-                                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500">
-                                      <svg
-                                        className="h-4 w-4"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                      >
-                                        <path
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          strokeWidth={2}
-                                          d="M19 9l-7 7-7-7"
-                                        />
-                                      </svg>
-                                    </div>
-                                  </div>
+                                  <select
+                                    className={`w-full px-3 py-2 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
+                                    value={b.day}
+                                    onChange={(e) =>
+                                      updateBlackout(i, "day", e.target.value)
+                                    }
+                                  >
+                                    <option value="">Select</option>
+                                    {DAYS.map((d) => (
+                                      <option key={d} value={d}>
+                                        {d}
+                                      </option>
+                                    ))}
+                                  </select>
                                 </div>
                                 <div className="space-y-1.5">
-                                  <label className="block text-sm font-medium text-slate-300">
+                                  <label className="block text-sm font-medium">
                                     Slot
                                   </label>
-                                  <div className="relative">
-                                    <select
-                                      className="w-full appearance-none rounded-lg border border-slate-700 bg-slate-800/70 pl-10 pr-10 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-                                      value={b.slot}
-                                      onChange={(e) =>
-                                        updateBlackout(
-                                          i,
-                                          "slot",
-                                          e.target.value
-                                        )
-                                      }
-                                    >
-                                      <option value="">Select</option>
-                                      {SLOTS.map((s) => (
-                                        <option key={s} value={s}>
-                                          {s}
-                                        </option>
-                                      ))}
-                                    </select>
-                                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                                      <ClockIcon size={16} />
-                                    </div>
-                                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500">
-                                      <svg
-                                        className="h-4 w-4"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                      >
-                                        <path
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          strokeWidth={2}
-                                          d="M19 9l-7 7-7-7"
-                                        />
-                                      </svg>
-                                    </div>
-                                  </div>
+                                  <select
+                                    className={`w-full px-3 py-2 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
+                                    value={b.slot}
+                                    onChange={(e) =>
+                                      updateBlackout(i, "slot", e.target.value)
+                                    }
+                                  >
+                                    <option value="">Select</option>
+                                    {SLOTS.map((s) => (
+                                      <option key={s} value={s}>
+                                        {s}
+                                      </option>
+                                    ))}
+                                  </select>
                                 </div>
                                 <div className="space-y-1.5">
-                                  <label className="block text-sm font-medium text-slate-300">
+                                  <label className="block text-sm font-medium">
                                     Reason
                                   </label>
-                                  <div className="relative">
-                                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                                      <AlertTriangleIcon size={16} />
-                                    </div>
-                                    <input
-                                      className="w-full rounded-lg border border-slate-700 bg-slate-800/70 pl-10 pr-4 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-                                      value={b.reason}
-                                      onChange={(e) =>
-                                        updateBlackout(
-                                          i,
-                                          "reason",
-                                          e.target.value
-                                        )
-                                      }
-                                      placeholder="Optional"
-                                    />
-                                  </div>
+                                  <input
+                                    className={`w-full px-3 py-2 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
+                                    value={b.reason}
+                                    onChange={(e) =>
+                                      updateBlackout(
+                                        i,
+                                        "reason",
+                                        e.target.value
+                                      )
+                                    }
+                                    placeholder="Optional"
+                                  />
                                 </div>
-                                <button
+                                <motion.button
                                   type="button"
-                                  className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-400/40 px-3 py-2 text-xs font-medium transition-colors"
+                                  className={`px-3 py-2 rounded-lg text-sm font-medium border ${
+                                    isDark
+                                      ? "bg-rose-100 text-rose-700 border-rose-200 hover:bg-rose-200"
+                                      : "bg-rose-500/20 text-rose-300 border-rose-400/40 hover:bg-rose-500/30"
+                                  } transition-colors flex items-center justify-center gap-1.5`}
                                   onClick={() => removeBlackout(i)}
+                                  whileHover={{ scale: 1.02 }}
+                                  whileTap={{ scale: 0.98 }}
                                 >
-                                  <TrashIcon size={14} />
+                                  <Trash2 size={14} />
                                   Remove
-                                </button>
-                              </div>
+                                </motion.button>
+                              </motion.div>
                             ))
                           ) : (
-                            <p className="text-slate-400 text-sm">
-                              No blackout windows added yet.
+                            <p className={`text-sm ${theme.mutedText}`}>
+                              No blackout windows added yet
                             </p>
                           )}
                         </div>
-                        <button
+                        <motion.button
                           type="button"
-                          className="mt-4 px-4 py-2 rounded-lg border border-slate-700 hover:bg-slate-800 transition-colors flex items-center gap-2"
+                          className={`mt-4 px-4 py-2.5 rounded-lg border ${theme.buttonBorder} ${theme.buttonBg} ${theme.buttonText} text-sm font-medium transition-colors flex items-center gap-2`}
                           onClick={addBlackout}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
                         >
-                          <PlusCircleIcon size={16} />
+                          <PlusCircle size={16} />
                           Add Blackout Window
-                        </button>
+                        </motion.button>
                       </fieldset>
-                      {/* Utilization preview */}
-                      <fieldset className="rounded-xl border border-slate-700 p-5 bg-slate-800/20">
-                        <legend className="px-2 text-sm font-medium text-slate-300">
-                          Utilization Preview
-                        </legend>
-                        <div className="grid grid-cols-7 gap-1 py-2 mb-3">
-                          {Array.from({
-                            length: DAYS.length * SLOTS.length,
-                          }).map((_, i) => (
-                            <span
-                              key={i}
-                              className="h-5 rounded bg-gradient-to-b from-indigo-400 to-purple-400"
-                              style={{
-                                opacity: 0.3 + (i % 7) * 0.1,
-                              }}
-                              aria-hidden="true"
-                            />
-                          ))}
-                        </div>
-                        <div className="flex items-center gap-2 text-slate-400">
-                          <span>Low</span>
-                          <div className="h-2 w-32 rounded bg-gradient-to-r from-indigo-400/20 to-purple-400" />
-                          <span>High</span>
-                        </div>
-                      </fieldset>
+
                       <div className="flex justify-end gap-3 pt-2">
-                        <button
+                        <motion.button
                           type="button"
                           onClick={() => {
                             setSelected(null);
                             setEdit(null);
                             setIsCreating(false);
                           }}
-                          className="px-5 py-2.5 rounded-lg border border-slate-700 text-sm font-medium hover:bg-slate-800 transition-colors flex items-center gap-2"
+                          className={`px-5 py-2.5 rounded-lg border ${theme.buttonBorder} ${theme.buttonBg} ${theme.buttonText} text-sm font-medium transition-colors flex items-center gap-2`}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
                         >
-                          <XIcon size={16} />
+                          <X size={16} />
                           Cancel
-                        </button>
-                        <button
+                        </motion.button>
+                        <motion.button
                           type="submit"
-                          className="px-5 py-2.5 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-sm font-medium shadow-lg shadow-indigo-900/30 hover:from-indigo-600 hover:to-purple-600 transition-all flex items-center gap-2"
+                          className={`px-5 py-2.5 rounded-lg bg-gradient-to-r ${theme.gradient} text-white text-sm font-semibold shadow-lg hover:shadow-xl transition-all flex items-center gap-2`}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
                         >
-                          <SaveIcon size={16} />
+                          <Save size={16} />
                           {isCreating ? "Create Room" : "Save Changes"}
-                        </button>
+                        </motion.button>
                       </div>
                     </form>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
         )}
-        {/* Delete Confirmation Dialog */}
+      </AnimatePresence>
+
+      {/* Delete Confirmation */}
+      <AnimatePresence>
         {deleteConfirm && (
-          <div className="fixed inset-0 z-50 overflow-hidden">
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
             <div
-              className="absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity"
+              className={`absolute inset-0 ${theme.modalOverlay} backdrop-blur-sm`}
               onClick={() => setDeleteConfirm(null)}
             />
-            <div className="fixed inset-0 flex items-center justify-center p-4">
-              <div className="w-full max-w-md rounded-2xl border border-slate-700 bg-slate-900 shadow-xl">
-                <div className="border-b border-slate-800 px-5 py-4">
-                  <h2 className="text-lg font-bold flex items-center gap-2 text-red-400">
-                    <AlertTriangleIcon size={18} />
-                    Delete Room
-                  </h2>
+            <motion.div
+              className={`relative w-full max-w-md rounded-2xl border ${theme.cardBorder} ${theme.modalBg} shadow-2xl`}
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+            >
+              <div
+                className={`border-b ${theme.cardBorder} px-6 py-4 flex items-center gap-3`}
+              >
+                <div
+                  className={`p-2 rounded-lg ${
+                    isDark ? "bg-rose-100" : "bg-rose-500/20"
+                  }`}
+                >
+                  <AlertTriangle
+                    size={18}
+                    className={isDark ? "text-rose-600" : "text-rose-400"}
+                  />
                 </div>
-                <div className="p-5">
-                  <p className="mb-6">
-                    Are you sure you want to delete{" "}
-                    <strong>{deleteConfirm.name}</strong>? This action cannot be
-                    undone.
-                  </p>
-                  <div className="flex justify-end gap-3">
-                    <button
-                      type="button"
-                      className="px-5 py-2.5 rounded-lg border border-slate-700 text-sm font-medium hover:bg-slate-800 transition-colors flex items-center gap-2"
-                      onClick={() => setDeleteConfirm(null)}
-                    >
-                      <XIcon size={16} />
-                      Cancel
-                    </button>
-                    <button
-                      type="button"
-                      className="px-5 py-2.5 rounded-lg bg-gradient-to-r from-red-500 to-rose-500 text-white text-sm font-medium shadow-lg shadow-red-900/30 hover:from-red-600 hover:to-rose-600 transition-all flex items-center gap-2"
-                      onClick={deleteRoom}
-                    >
-                      <TrashIcon size={16} />
-                      Delete
-                    </button>
-                  </div>
+                <h2 className="text-lg font-bold">Delete Room</h2>
+              </div>
+              <div className="p-6">
+                <p className="mb-6">
+                  Are you sure you want to delete{" "}
+                  <strong>{deleteConfirm.name}</strong>? This action cannot be
+                  undone.
+                </p>
+                <div className="flex justify-end gap-3">
+                  <motion.button
+                    type="button"
+                    className={`px-5 py-2.5 rounded-lg border ${theme.buttonBorder} ${theme.buttonBg} ${theme.buttonText} text-sm font-medium transition-colors flex items-center gap-2`}
+                    onClick={() => setDeleteConfirm(null)}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <X size={16} />
+                    Cancel
+                  </motion.button>
+                  <motion.button
+                    type="button"
+                    className={`px-5 py-2.5 rounded-lg text-white text-sm font-semibold shadow-lg transition-all flex items-center gap-2 ${
+                      isDark
+                        ? "bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700"
+                        : "bg-gradient-to-r from-rose-400 to-rose-500 hover:from-rose-500 hover:to-rose-600"
+                    }`}
+                    onClick={deleteRoom}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <Trash2 size={16} />
+                    Delete
+                  </motion.button>
                 </div>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         )}
-      </main>
+      </AnimatePresence>
     </div>
   );
 }
+
 function LabeledInput({
   label,
   value,
@@ -945,15 +982,16 @@ function LabeledInput({
   icon,
   placeholder,
   required = false,
+  theme,
 }) {
   return (
     <div className="space-y-1.5">
-      <label className="block text-sm font-medium text-slate-300">
-        {label}
-      </label>
+      <label className="block text-sm font-semibold">{label}</label>
       <div className="relative">
         {icon && (
-          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+          <div
+            className={`absolute left-3 top-1/2 -translate-y-1/2 ${theme.mutedText}`}
+          >
             {icon}
           </div>
         )}
@@ -961,9 +999,13 @@ function LabeledInput({
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className={`w-full rounded-lg border border-slate-700 bg-slate-800/70 ${
+          className={`w-full ${
             icon ? "pl-10" : "pl-4"
-          } pr-4 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all`}
+          } pr-4 py-2.5 rounded-lg border ${theme.inputBorder} ${
+            theme.inputBg
+          } ${
+            theme.inputText
+          } text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
           placeholder={placeholder}
           required={required}
         />
@@ -971,15 +1013,16 @@ function LabeledInput({
     </div>
   );
 }
-function LabeledNumber({ label, value, onChange, icon }) {
+
+function LabeledNumber({ label, value, onChange, icon, theme }) {
   return (
     <div className="space-y-1.5">
-      <label className="block text-sm font-medium text-slate-300">
-        {label}
-      </label>
+      <label className="block text-sm font-semibold">{label}</label>
       <div className="relative">
         {icon && (
-          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+          <div
+            className={`absolute left-3 top-1/2 -translate-y-1/2 ${theme.mutedText}`}
+          >
             {icon}
           </div>
         )}
@@ -987,9 +1030,13 @@ function LabeledNumber({ label, value, onChange, icon }) {
           type="number"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className={`w-full rounded-lg border border-slate-700 bg-slate-800/70 ${
+          className={`w-full ${
             icon ? "pl-10" : "pl-4"
-          } pr-4 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all`}
+          } pr-4 py-2.5 rounded-lg border ${theme.inputBorder} ${
+            theme.inputBg
+          } ${
+            theme.inputText
+          } text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
           required
         />
       </div>

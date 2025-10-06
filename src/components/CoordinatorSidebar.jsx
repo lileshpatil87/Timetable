@@ -26,6 +26,7 @@ import {
 
 const menuItems = [
   { title: "Dashboard", url: "/coordinator", icon: LayoutDashboard },
+  { title: "Generate Timetable", url: "/coordinator/generate", icon: Shuffle },
 
   // Registration Section
   {
@@ -58,7 +59,7 @@ const menuItems = [
   { title: "View Rooms", url: "/coordinator/rooms", icon: DoorOpen },
 
   // Timetable Management
-  // { title: "Generate Timetable", url: "/coordinator/generate", icon: Shuffle },
+
   { title: "View Timetables", url: "/coordinator/timetables", icon: Calendar },
   // { title: "Conflict Resolution", url: "/coordinator/conflicts", icon: AlertTriangle },
 

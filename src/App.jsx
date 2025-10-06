@@ -28,6 +28,7 @@ import RegisterHOD from "./pages/RegisterHOD";
 import RegisterFaculty from "./pages/RegisterFaculty";
 import CoordinatorDashboard from "./pages/CoordinatorDashboard";
 import ViewRooms from "./pages/ViewRooms";
+import GenerateTimetable from "./pages/GenerateTimetable";
 
 function App() {
   return (
@@ -94,7 +95,7 @@ function App() {
           <Route path="rooms" element={<ViewRooms />} />
 
           {/* Timetable Generation & Management */}
-          <Route path="generate" element={<ScenarioComposer />} />
+          <Route path="generate" element={<GenerateTimetable />} />
           <Route path="timetables" element={<Timetables />} />
           <Route path="conflicts" element={<ConflictExplorer />} />
 

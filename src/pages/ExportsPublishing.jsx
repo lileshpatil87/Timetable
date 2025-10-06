@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { useOutletContext } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import CustomDropdown from "../components/CustomDropdown";
+
 import {
   FileText,
   File,
@@ -334,88 +336,44 @@ export default function ExportsPublishing() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           {/* Audience */}
           <div className="space-y-2">
-            <label className="block text-sm font-semibold">Audience</label>
-            <div className="relative">
-              <div
-                className={`absolute left-3 top-1/2 -translate-y-1/2 ${theme.mutedText}`}
-              >
-                {AUDIENCE_ICONS[audience]}
-              </div>
-              <select
-                className={`w-full appearance-none pl-10 pr-10 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
-                value={audience}
-                onChange={(e) => {
-                  setAudience(e.target.value);
-                  setEntity("");
-                }}
-              >
-                {AUDIENCES.map((a) => (
-                  <option key={a}>{a}</option>
-                ))}
-              </select>
-              <ChevronDown
-                size={16}
-                className={`absolute right-3 top-1/2 -translate-y-1/2 ${theme.mutedText} pointer-events-none`}
-              />
-            </div>
+            <CustomDropdown
+              label="Audience"
+              name="audience"
+              id="export-audience"
+              value={audience}
+              onChange={(e) => {
+                setAudience(e.target.value);
+                setEntity("");
+              }}
+              options={AUDIENCES}
+              theme={isDark ? "dark" : "light"}
+            />
           </div>
 
           {/* Entity Selector */}
           <div className="space-y-2">
-            <label className="block text-sm font-semibold">
-              {audience} Selector
-            </label>
-            <div className="relative">
-              <div
-                className={`absolute left-3 top-1/2 -translate-y-1/2 ${theme.mutedText}`}
-              >
-                {AUDIENCE_ICONS[audience]}
-              </div>
-              <select
-                className={`w-full appearance-none pl-10 pr-10 py-2.5 rounded-lg border ${
-                  theme.inputBorder
-                } ${theme.inputBg} ${
-                  theme.inputText
-                } text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${
-                  batchAll ? "opacity-60 cursor-not-allowed" : ""
-                }`}
-                value={entity}
-                onChange={(e) => setEntity(e.target.value)}
-                disabled={batchAll}
-              >
-                {!batchAll && entities.map((x) => <option key={x}>{x}</option>)}
-                {batchAll && <option>All</option>}
-              </select>
-              <ChevronDown
-                size={16}
-                className={`absolute right-3 top-1/2 -translate-y-1/2 ${theme.mutedText} pointer-events-none`}
-              />
-            </div>
+            <CustomDropdown
+              label={`${audience} Selector`}
+              name="entity"
+              id="export-entity"
+              value={batchAll ? "All" : entity}
+              onChange={(e) => setEntity(e.target.value)}
+              options={batchAll ? ["All"] : entities}
+              theme={isDark ? "dark" : "light"}
+              error={entities.length === 0 ? "No entities available" : ""}
+            />
           </div>
-
           {/* Format */}
           <div className="space-y-2">
-            <label className="block text-sm font-semibold">Format</label>
-            <div className="relative">
-              <div
-                className={`absolute left-3 top-1/2 -translate-y-1/2 ${theme.mutedText}`}
-              >
-                {FORMAT_ICONS[format]}
-              </div>
-              <select
-                className={`w-full appearance-none pl-10 pr-10 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
-                value={format}
-                onChange={(e) => setFormat(e.target.value)}
-              >
-                {FORMATS.map((f) => (
-                  <option key={f}>{f}</option>
-                ))}
-              </select>
-              <ChevronDown
-                size={16}
-                className={`absolute right-3 top-1/2 -translate-y-1/2 ${theme.mutedText} pointer-events-none`}
-              />
-            </div>
+            <CustomDropdown
+              label="Format"
+              name="format"
+              id="export-format"
+              value={format}
+              onChange={(e) => setFormat(e.target.value)}
+              options={FORMATS}
+              theme={isDark ? "dark" : "light"}
+            />
           </div>
         </div>
 

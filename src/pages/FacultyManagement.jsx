@@ -203,10 +203,10 @@ export default function FacultyManagement() {
 
   const getDeptColor = (dept) => {
     const colors = {
-      Education: isDark
+      Education: !isDark
         ? "bg-indigo-100 text-indigo-700 border-indigo-200"
         : "bg-indigo-500/20 text-indigo-300 border-indigo-400/40",
-      CS: isDark
+      CS: !isDark
         ? "bg-emerald-100 text-emerald-700 border-emerald-200"
         : "bg-emerald-500/20 text-emerald-300 border-emerald-400/40",
       Mathematics: isDark
@@ -294,7 +294,6 @@ export default function FacultyManagement() {
                   "Teaching Load",
                   "Preferences",
                   "Supervision",
-                  "Actions",
                 ].map((h) => (
                   <th
                     key={h}
@@ -330,8 +329,8 @@ export default function FacultyManagement() {
                     className={`border-b ${theme.tableBorder} ${
                       selected?.id === f.id
                         ? isDark
-                          ? "bg-indigo-50"
-                          : "bg-indigo-500/10"
+                          ? "bg-indigo-500/10"
+                          : "bg-indigo-50"
                         : theme.hoverBg
                     } transition-colors`}
                     initial={{ opacity: 0, y: 10 }}
@@ -342,13 +341,13 @@ export default function FacultyManagement() {
                       <div className="flex items-center gap-3">
                         <div
                           className={`flex items-center justify-center w-10 h-10 rounded-xl ${
-                            isDark ? "bg-indigo-100" : "bg-indigo-500/20"
+                            isDark ? "bg-indigo-500/20" : "bg-indigo-100"
                           }`}
                         >
                           <User
                             size={18}
                             className={
-                              isDark ? "text-indigo-600" : "text-indigo-400"
+                              isDark ? "text-indigo-400" : "text-indigo-600"
                             }
                           />
                         </div>
@@ -360,6 +359,7 @@ export default function FacultyManagement() {
                         </div>
                       </div>
                     </td>
+
                     <td className="px-4 py-4">
                       <span
                         className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium ${getDeptColor(
@@ -370,6 +370,7 @@ export default function FacultyManagement() {
                         {f.dept}
                       </span>
                     </td>
+
                     <td className="px-4 py-4">
                       <div className="flex flex-wrap gap-1.5">
                         {f.expertise.map((e, i) => (
@@ -377,8 +378,8 @@ export default function FacultyManagement() {
                             key={i}
                             className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium ${
                               isDark
-                                ? "bg-blue-100 text-blue-700 border-blue-200"
-                                : "bg-blue-500/20 text-blue-300 border-blue-400/30"
+                                ? "bg-blue-500/20 text-blue-300 border-blue-400/30"
+                                : "bg-blue-100 text-blue-700 border-blue-200"
                             }`}
                           >
                             {getExpertiseIcon(e)}
@@ -387,6 +388,7 @@ export default function FacultyManagement() {
                         ))}
                       </div>
                     </td>
+
                     <td className="px-4 py-4">
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-sm">
@@ -399,7 +401,7 @@ export default function FacultyManagement() {
                         </div>
                         <div
                           className={`h-2 w-full rounded-full overflow-hidden ${
-                            isDark ? "bg-gray-200" : "bg-slate-700"
+                            isDark ? "bg-slate-700" : "bg-gray-200"
                           }`}
                         >
                           <div
@@ -409,14 +411,15 @@ export default function FacultyManagement() {
                         </div>
                       </div>
                     </td>
+
                     <td className="px-4 py-4">
                       <div className="flex flex-wrap gap-1.5">
                         {f.preferences.morning && (
                           <span
                             className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium ${
                               isDark
-                                ? "bg-amber-100 text-amber-700 border-amber-200"
-                                : "bg-amber-500/20 text-amber-300 border-amber-400/30"
+                                ? "bg-amber-500/20 text-amber-300 border-amber-400/30"
+                                : "bg-amber-100 text-amber-700 border-amber-200"
                             }`}
                           >
                             <Sun size={14} />
@@ -427,8 +430,8 @@ export default function FacultyManagement() {
                           <span
                             className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium ${
                               isDark
-                                ? "bg-emerald-100 text-emerald-700 border-emerald-200"
-                                : "bg-emerald-500/20 text-emerald-300 border-emerald-400/30"
+                                ? "bg-emerald-500/20 text-emerald-300 border-emerald-400/30"
+                                : "bg-emerald-100 text-emerald-700 border-emerald-200"
                             }`}
                           >
                             <Calendar size={14} />
@@ -437,6 +440,7 @@ export default function FacultyManagement() {
                         )}
                       </div>
                     </td>
+
                     <td className="px-4 py-4">
                       <div className="space-y-1">
                         {f.supervision.preInternship && (
@@ -462,21 +466,6 @@ export default function FacultyManagement() {
                             </span>
                           )}
                       </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <motion.button
-                        onClick={() => openEdit(f)}
-                        className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
-                          isDark
-                            ? "bg-indigo-100 text-indigo-700 border-indigo-200 hover:bg-indigo-200"
-                            : "bg-indigo-500/20 text-indigo-300 border-indigo-400/40 hover:bg-indigo-500/30"
-                        }`}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <Pencil size={14} />
-                        Edit
-                      </motion.button>
                     </td>
                   </motion.tr>
                 );

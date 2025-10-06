@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useOutletContext } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import CustomDropdown from "../components/CustomDropdown";
+
 import {
   Search,
   Filter,
@@ -326,24 +328,15 @@ export default function ViewPrograms() {
           </div>
 
           {/* Category */}
-          <div className="relative">
-            <select
-              value={filters.cat}
-              onChange={(e) =>
-                setFilters((f) => ({ ...f, cat: e.target.value }))
-              }
-              className={`w-full appearance-none pl-4 pr-10 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
-            >
-              <option>All</option>
-              {CATEGORY_OPTIONS.map((o) => (
-                <option key={o}>{o}</option>
-              ))}
-            </select>
-            <LayoutGrid
-              size={16}
-              className={`absolute right-3 top-1/2 -translate-y-1/2 ${theme.mutedText} pointer-events-none`}
-            />
-          </div>
+          <CustomDropdown
+            name="category"
+            id="filter-category"
+            value={filters.cat}
+            onChange={(e) => setFilters((f) => ({ ...f, cat: e.target.value }))}
+            options={["All", ...CATEGORY_OPTIONS]}
+            theme={isDark ? "dark" : "light"}
+            placeholder="Category"
+          />
 
           {/* Min Credits */}
           <input
@@ -368,23 +361,17 @@ export default function ViewPrograms() {
           />
 
           {/* Has Lab */}
-          <div className="relative">
-            <select
-              value={filters.hasLab}
-              onChange={(e) =>
-                setFilters((f) => ({ ...f, hasLab: e.target.value }))
-              }
-              className={`w-full appearance-none pl-4 pr-10 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
-            >
-              <option>All</option>
-              <option>Yes</option>
-              <option>No</option>
-            </select>
-            <FlaskConical
-              size={16}
-              className={`absolute right-3 top-1/2 -translate-y-1/2 ${theme.mutedText} pointer-events-none`}
-            />
-          </div>
+          <CustomDropdown
+            name="hasLab"
+            id="filter-lab"
+            value={filters.hasLab}
+            onChange={(e) =>
+              setFilters((f) => ({ ...f, hasLab: e.target.value }))
+            }
+            options={["All", "Yes", "No"]}
+            theme={isDark ? "dark" : "light"}
+            placeholder="Lab filter"
+          />
         </div>
       </motion.section>
 

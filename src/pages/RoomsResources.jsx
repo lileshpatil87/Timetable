@@ -1,5 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import CustomDropdown from "../components/CustomDropdown";
+import { useOutletContext } from "react-router-dom";
+
 import {
   Plus,
   Search,
@@ -20,7 +23,9 @@ import {
   Calendar,
   Monitor,
   Sun,
+  Sparkles,
   Moon,
+  ShieldCheck,
 } from "lucide-react";
 
 const TYPES = ["Lecture", "Lab", "Studio"];
@@ -83,7 +88,31 @@ function loadState() {
   return r ? JSON.parse(r) : seedRooms;
 }
 
-export default function RoomsResources({ theme, isDark }) {
+export default function RoomsResources() {
+  const outletContext = useOutletContext();
+
+  const { theme: contextTheme, isDark: contextIsDark } = outletContext || {};
+
+  const [localIsDark] = useState(false);
+  const isDark = contextIsDark !== undefined ? contextIsDark : localIsDark;
+
+  const defaultTheme = {
+    bg: isDark ? "bg-slate-950" : "bg-gray-50",
+    text: isDark ? "text-slate-50" : "text-gray-900",
+    cardBg: isDark ? "bg-slate-900/50" : "bg-white",
+    cardBorder: isDark ? "border-slate-800/60" : "border-gray-200",
+    mutedText: isDark ? "text-slate-400" : "text-gray-600",
+    gradient: isDark
+      ? "from-indigo-400 via-purple-400 to-pink-400"
+      : "from-indigo-600 via-purple-600 to-pink-600",
+    accentBg: isDark ? "bg-slate-800/30" : "bg-gray-50",
+    accentBorder: isDark ? "border-slate-700/40" : "border-gray-200",
+    inputBg: isDark ? "bg-slate-800/50" : "bg-white",
+    inputBorder: isDark ? "border-slate-700" : "border-gray-300",
+    inputText: isDark ? "text-slate-100" : "text-gray-900",
+  };
+
+  const theme = contextTheme || defaultTheme;
   const [rooms, setRooms] = useState(loadState());
   const [filters, setFilters] = useState({
     q: "",
@@ -233,17 +262,17 @@ export default function RoomsResources({ theme, isDark }) {
   const getRoomTypeColor = (type) => {
     if (type === "Lecture") {
       return isDark
-        ? "bg-blue-100 text-blue-700 border-blue-200"
-        : "bg-blue-500/20 text-blue-300 border-blue-400/40";
+        ? "bg-blue-500/20 text-blue-300 border-blue-400/40"
+        : "bg-blue-100 text-blue-700 border-blue-200";
     }
     if (type === "Lab") {
       return isDark
-        ? "bg-emerald-100 text-emerald-700 border-emerald-200"
-        : "bg-emerald-500/20 text-emerald-300 border-emerald-400/40";
+        ? "bg-emerald-500/20 text-emerald-300 border-emerald-400/40"
+        : "bg-emerald-100 text-emerald-700 border-emerald-200";
     }
     return isDark
-      ? "bg-purple-100 text-purple-700 border-purple-200"
-      : "bg-purple-500/20 text-purple-300 border-purple-400/40";
+      ? "bg-purple-500/20 text-purple-300 border-purple-400/40"
+      : "bg-purple-100 text-purple-700 border-purple-200";
   };
 
   const getRoomTypeIcon = (type) => {
@@ -254,6 +283,41 @@ export default function RoomsResources({ theme, isDark }) {
 
   return (
     <div className="space-y-6">
+      {/* Page Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-start gap-4">
+            <div
+              className={`p-3 rounded-xl ${
+                isDark ? "bg-indigo-100" : "bg-indigo-500/20"
+              }`}
+            >
+              <Sparkles
+                size={24}
+                className={isDark ? "text-indigo-600" : "text-indigo-400"}
+              />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold mb-2">
+                Register Rooms & Resources
+              </h1>
+            </div>
+          </div>
+          <div
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border ${theme.accentBorder} ${theme.accentBg}`}
+          >
+            <ShieldCheck
+              size={16}
+              className={isDark ? "text-indigo-600" : "text-indigo-400"}
+            />
+            <span className="text-xs font-medium">HOD Access</span>
+          </div>
+        </div>
+      </motion.div>
       {/* Filters */}
       <motion.section
         className={`rounded-2xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm p-6 shadow-sm`}
@@ -288,7 +352,9 @@ export default function RoomsResources({ theme, isDark }) {
             />
           </div>
 
-          <select
+          <CustomDropdown
+            name="type"
+            id="filter-type"
             value={filters.type}
             onChange={(e) =>
               setFilters((f) => ({
@@ -296,13 +362,10 @@ export default function RoomsResources({ theme, isDark }) {
                 type: e.target.value,
               }))
             }
-            className={`w-full px-4 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all appearance-none`}
-          >
-            <option>All</option>
-            {TYPES.map((t) => (
-              <option key={t}>{t}</option>
-            ))}
-          </select>
+            options={["All", ...TYPES]}
+            theme={isDark ? "dark" : "light"}
+            placeholder="Room type"
+          />
 
           <input
             type="number"
@@ -330,7 +393,9 @@ export default function RoomsResources({ theme, isDark }) {
             className={`w-full px-4 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
           />
 
-          <select
+          <CustomDropdown
+            name="hasEquip"
+            id="filter-equipment"
             value={filters.hasEquip}
             onChange={(e) =>
               setFilters((f) => ({
@@ -338,12 +403,10 @@ export default function RoomsResources({ theme, isDark }) {
                 hasEquip: e.target.value,
               }))
             }
-            className={`w-full px-4 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all appearance-none`}
-          >
-            <option>All</option>
-            <option>Yes</option>
-            <option>No</option>
-          </select>
+            options={["All", "Yes", "No"]}
+            theme={isDark ? "dark" : "light"}
+            placeholder="Equipment"
+          />
         </div>
       </motion.section>
 
@@ -458,11 +521,11 @@ export default function RoomsResources({ theme, isDark }) {
                         className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-semibold ${
                           r.blackouts.length === 0
                             ? isDark
-                              ? "bg-emerald-100 text-emerald-700 border-emerald-200"
-                              : "bg-emerald-500/20 text-emerald-300 border-emerald-400/40"
+                              ? "bg-emerald-500/20 text-emerald-300 border-emerald-400/40"
+                              : "bg-emerald-100 text-emerald-700 border-emerald-200"
                             : isDark
-                            ? "bg-amber-100 text-amber-700 border-amber-200"
-                            : "bg-amber-500/20 text-amber-300 border-amber-400/40"
+                            ? "bg-amber-500/20 text-amber-300 border-amber-400/40"
+                            : "bg-amber-100 text-amber-700 border-amber-200"
                         }`}
                       >
                         {r.blackouts.length === 0 ? (
@@ -484,8 +547,8 @@ export default function RoomsResources({ theme, isDark }) {
                         <motion.button
                           className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium border ${
                             isDark
-                              ? "bg-indigo-100 text-indigo-700 border-indigo-200 hover:bg-indigo-200"
-                              : "bg-indigo-500/20 text-indigo-300 border-indigo-400/40 hover:bg-indigo-500/30"
+                              ? "bg-indigo-500/20 text-indigo-300 border-indigo-400/40 hover:bg-indigo-500/30"
+                              : "bg-indigo-100 text-indigo-700 border-indigo-200 hover:bg-indigo-200"
                           } transition-colors`}
                           onClick={() => openEdit(r)}
                           whileHover={{ scale: 1.05 }}
@@ -497,8 +560,8 @@ export default function RoomsResources({ theme, isDark }) {
                         <motion.button
                           className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium border ${
                             isDark
-                              ? "bg-rose-100 text-rose-700 border-rose-200 hover:bg-rose-200"
-                              : "bg-rose-500/20 text-rose-300 border-rose-400/40 hover:bg-rose-500/30"
+                              ? "bg-rose-500/20 text-rose-300 border-rose-400/40 hover:bg-rose-500/30"
+                              : "bg-rose-100 text-rose-700 border-rose-200 hover:bg-rose-200"
                           } transition-colors`}
                           onClick={() => confirmDelete(r)}
                           whileHover={{ scale: 1.05 }}
@@ -630,31 +693,21 @@ export default function RoomsResources({ theme, isDark }) {
                             theme={theme}
                             required
                           />
-                          <div className="space-y-1.5">
-                            <label className="block text-sm font-semibold">
-                              Room Type
-                            </label>
-                            <div className="relative">
-                              <LayoutGrid
-                                size={16}
-                                className={`absolute left-3 top-1/2 -translate-y-1/2 ${theme.mutedText}`}
-                              />
-                              <select
-                                value={edit.type}
-                                onChange={(e) =>
-                                  setEdit({
-                                    ...edit,
-                                    type: e.target.value,
-                                  })
-                                }
-                                className={`w-full pl-10 pr-4 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all appearance-none`}
-                              >
-                                {TYPES.map((t) => (
-                                  <option key={t}>{t}</option>
-                                ))}
-                              </select>
-                            </div>
-                          </div>
+                          <CustomDropdown
+                            label="Room Type"
+                            name="type"
+                            id="edit-room-type"
+                            value={edit.type}
+                            onChange={(e) =>
+                              setEdit({
+                                ...edit,
+                                type: e.target.value,
+                              })
+                            }
+                            options={TYPES}
+                            theme={isDark ? "light" : "dark"}
+                          />
+
                           <LabeledNumber
                             label="Capacity"
                             value={edit.capacity}
@@ -777,44 +830,32 @@ export default function RoomsResources({ theme, isDark }) {
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: 20 }}
                               >
-                                <div className="space-y-1.5">
-                                  <label className="block text-sm font-medium">
-                                    Day
-                                  </label>
-                                  <select
-                                    className={`w-full px-3 py-2 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
-                                    value={b.day}
-                                    onChange={(e) =>
-                                      updateBlackout(i, "day", e.target.value)
-                                    }
-                                  >
-                                    <option value="">Select</option>
-                                    {DAYS.map((d) => (
-                                      <option key={d} value={d}>
-                                        {d}
-                                      </option>
-                                    ))}
-                                  </select>
-                                </div>
-                                <div className="space-y-1.5">
-                                  <label className="block text-sm font-medium">
-                                    Slot
-                                  </label>
-                                  <select
-                                    className={`w-full px-3 py-2 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
-                                    value={b.slot}
-                                    onChange={(e) =>
-                                      updateBlackout(i, "slot", e.target.value)
-                                    }
-                                  >
-                                    <option value="">Select</option>
-                                    {SLOTS.map((s) => (
-                                      <option key={s} value={s}>
-                                        {s}
-                                      </option>
-                                    ))}
-                                  </select>
-                                </div>
+                                <CustomDropdown
+                                  label="Day"
+                                  name={`blackout-day-${i}`}
+                                  id={`blackout-day-${i}`}
+                                  value={b.day}
+                                  onChange={(e) =>
+                                    updateBlackout(i, "day", e.target.value)
+                                  }
+                                  options={["", ...DAYS]}
+                                  theme={isDark ? "light" : "dark"}
+                                  placeholder="Select day"
+                                />
+
+                                <CustomDropdown
+                                  label="Slot"
+                                  name={`blackout-slot-${i}`}
+                                  id={`blackout-slot-${i}`}
+                                  value={b.slot}
+                                  onChange={(e) =>
+                                    updateBlackout(i, "slot", e.target.value)
+                                  }
+                                  options={["", ...SLOTS]}
+                                  theme={isDark ? "light" : "dark"}
+                                  placeholder="Select time"
+                                />
+
                                 <div className="space-y-1.5">
                                   <label className="block text-sm font-medium">
                                     Reason

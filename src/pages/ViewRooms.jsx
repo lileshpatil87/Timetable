@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import CustomDropdown from "../components/CustomDropdown";
+
 import {
   Search,
   Filter,
@@ -150,16 +152,16 @@ export default function ViewRooms() {
 
   const getRoomTypeColor = (type) => {
     if (type === "Lecture") {
-      return isDark
+      return !isDark
         ? "bg-blue-100 text-blue-700 border-blue-200"
         : "bg-blue-500/20 text-blue-300 border-blue-400/40";
     }
     if (type === "Lab") {
-      return isDark
+      return !isDark
         ? "bg-emerald-100 text-emerald-700 border-emerald-200"
         : "bg-emerald-500/20 text-emerald-300 border-emerald-400/40";
     }
-    return isDark
+    return !isDark
       ? "bg-purple-100 text-purple-700 border-purple-200"
       : "bg-purple-500/20 text-purple-300 border-purple-400/40";
   };
@@ -339,7 +341,7 @@ export default function ViewRooms() {
 
       {/* Filters */}
       <motion.section
-        className={`rounded-2xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm p-6 shadow-sm`}
+        className={`rounded-2xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm p-6 shadow-sm z-[9999]`}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -351,8 +353,8 @@ export default function ViewRooms() {
           />
           Filter Rooms
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          <div className="relative">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 z-[9999]">
+          <div className="relative z-[9999]">
             <Search
               size={16}
               className={`absolute left-3 top-1/2 -translate-y-1/2 ${theme.mutedText}`}
@@ -371,7 +373,9 @@ export default function ViewRooms() {
             />
           </div>
 
-          <select
+          <CustomDropdown
+            name="type"
+            id="filter-type"
             value={filters.type}
             onChange={(e) =>
               setFilters((f) => ({
@@ -379,13 +383,10 @@ export default function ViewRooms() {
                 type: e.target.value,
               }))
             }
-            className={`w-full px-4 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all appearance-none`}
-          >
-            <option>All</option>
-            {TYPES.map((t) => (
-              <option key={t}>{t}</option>
-            ))}
-          </select>
+            options={["All", ...TYPES]}
+            theme={isDark ? "dark" : "light"}
+            placeholder="Room type"
+          />
 
           <input
             type="number"
@@ -413,7 +414,9 @@ export default function ViewRooms() {
             className={`w-full px-4 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
           />
 
-          <select
+          <CustomDropdown
+            name="hasEquip"
+            id="filter-equipment"
             value={filters.hasEquip}
             onChange={(e) =>
               setFilters((f) => ({
@@ -421,12 +424,10 @@ export default function ViewRooms() {
                 hasEquip: e.target.value,
               }))
             }
-            className={`w-full px-4 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all appearance-none`}
-          >
-            <option>All</option>
-            <option>Yes</option>
-            <option>No</option>
-          </select>
+            options={["All", "Yes", "No"]}
+            theme={isDark ? "dark" : "light"}
+            placeholder="Equipment"
+          />
         </div>
       </motion.section>
 
@@ -531,10 +532,10 @@ export default function ViewRooms() {
                       <span
                         className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium ${
                           r.blackouts.length === 0
-                            ? isDark
+                            ? !isDark
                               ? "bg-emerald-100 text-emerald-700 border-emerald-200"
                               : "bg-emerald-500/20 text-emerald-300 border-emerald-400/40"
-                            : isDark
+                            : !isDark
                             ? "bg-amber-100 text-amber-700 border-amber-200"
                             : "bg-amber-500/20 text-amber-300 border-amber-400/40"
                         }`}

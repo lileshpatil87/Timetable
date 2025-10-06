@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import CustomDropdown from "../components/CustomDropdown";
 import {
   BookOpen,
   Search,
@@ -26,122 +27,326 @@ import {
   BarChart3,
   Sparkles,
   ChevronRight,
+  School,
+  Brain,
+  Target,
+  FileText,
 } from "lucide-react";
 
 const CATEGORY_OPTIONS = [
-  "Major",
-  "Minor",
-  "MDC",
-  "AEC",
-  "SEC",
-  "VAC",
-  "Internship",
-  "Research",
+  "Education Core",
+  "Subject Pedagogy",
+  "Subject Major",
+  "Subject Minor",
+  "Practicum",
+  "Education Elective",
+  "Foundation Course",
+  "M.Ed. Core",
+  "Research Methodology",
 ];
 
-// Category icons mapping
+// Category icons mapping for Teacher Education
 const CATEGORY_ICONS = {
-  Major: { icon: <BookMarked size={14} />, color: "blue" },
-  Minor: { icon: <BookOpen size={14} />, color: "violet" },
-  MDC: { icon: <Puzzle size={14} />, color: "indigo" },
-  AEC: { icon: <GraduationCap size={14} />, color: "emerald" },
-  SEC: { icon: <Users size={14} />, color: "amber" },
-  VAC: { icon: <FlaskConical size={14} />, color: "pink" },
-  Internship: { icon: <Briefcase size={14} />, color: "cyan" },
-  Research: { icon: <BarChart3 size={14} />, color: "rose" },
+  "Education Core": { icon: <BookMarked size={14} />, color: "blue" },
+  "Subject Pedagogy": { icon: <Brain size={14} />, color: "amber" },
+  "Subject Major": { icon: <BookOpen size={14} />, color: "emerald" },
+  "Subject Minor": { icon: <Puzzle size={14} />, color: "cyan" },
+  Practicum: { icon: <Briefcase size={14} />, color: "rose" },
+  "Education Elective": { icon: <GraduationCap size={14} />, color: "violet" },
+  "Foundation Course": { icon: <Home size={14} />, color: "indigo" },
+  "M.Ed. Core": { icon: <Target size={14} />, color: "purple" },
+  "Research Methodology": { icon: <FileText size={14} />, color: "pink" },
 };
 
 const seedCourses = [
   {
-    code: "EDU201",
-    title: "Foundations of Education",
-    category: "Major",
-    credits: 3,
-    l: 3,
+    code: "ED201",
+    title: "Learning & Teaching",
+    category: "Education Core",
+    credits: 4,
+    l: 4,
     t: 0,
     p: 0,
     duration: 60,
     lab: false,
   },
   {
-    code: "CSC214",
-    title: "Data Structures Lab",
-    category: "SEC",
-    credits: 2,
-    l: 0,
+    code: "ED342",
+    title: "Computer Science Pedagogy",
+    category: "Subject Pedagogy",
+    credits: 4,
+    l: 2,
     t: 0,
     p: 2,
-    duration: 120,
+    duration: 60,
     lab: true,
   },
   {
-    code: "MDC105",
-    title: "Design Thinking",
-    category: "MDC",
-    credits: 3,
-    l: 2,
+    code: "ED331",
+    title: "School Internship I",
+    category: "Practicum",
+    credits: 2,
+    l: 0,
+    t: 0,
+    p: 4,
+    duration: 120,
+    lab: false,
+  },
+  {
+    code: "CS203",
+    title: "Data Structures",
+    category: "Subject Major",
+    credits: 4,
+    l: 3,
     t: 1,
     p: 0,
     duration: 60,
     lab: false,
   },
   {
-    code: "AEC101",
-    title: "Academic Writing",
-    category: "AEC",
-    credits: 2,
-    l: 2,
+    code: "ED215",
+    title: "Educational Psychology",
+    category: "Education Elective",
+    credits: 4,
+    l: 4,
     t: 0,
     p: 0,
     duration: 60,
     lab: false,
   },
   {
-    code: "ITEP210",
-    title: "Microteaching",
-    category: "Major",
-    credits: 2,
+    code: "ED344",
+    title: "Mathematics Pedagogy",
+    category: "Subject Pedagogy",
+    credits: 4,
+    l: 2,
+    t: 1,
+    p: 1,
+    duration: 60,
+    lab: true,
+  },
+  {
+    code: "MA201",
+    title: "Discrete Mathematics",
+    category: "Subject Minor",
+    credits: 4,
+    l: 3,
+    t: 1,
+    p: 0,
+    duration: 60,
+    lab: false,
+  },
+  {
+    code: "ED401",
+    title: "Assessment of Learning",
+    category: "Education Core",
+    credits: 4,
+    l: 3,
+    t: 1,
+    p: 0,
+    duration: 60,
+    lab: false,
+  },
+  {
+    code: "ED332",
+    title: "Teaching Practice",
+    category: "Practicum",
+    credits: 4,
+    l: 0,
+    t: 0,
+    p: 8,
+    duration: 180,
+    lab: false,
+  },
+  {
+    code: "ED501",
+    title: "Research Methodology in Education",
+    category: "M.Ed. Core",
+    credits: 4,
+    l: 4,
+    t: 0,
+    p: 0,
+    duration: 60,
+    lab: false,
+  },
+  {
+    code: "ED225",
+    title: "Childhood & Growing Up",
+    category: "Education Core",
+    credits: 4,
+    l: 4,
+    t: 0,
+    p: 0,
+    duration: 60,
+    lab: false,
+  },
+  {
+    code: "ED355",
+    title: "Curriculum Design Lab",
+    category: "Subject Pedagogy",
+    credits: 4,
     l: 1,
+    t: 0,
+    p: 3,
+    duration: 90,
+    lab: true,
+  },
+  {
+    code: "ED120",
+    title: "Foundations of Education",
+    category: "Foundation Course",
+    credits: 4,
+    l: 4,
+    t: 0,
+    p: 0,
+    duration: 60,
+    lab: false,
+  },
+  {
+    code: "ED346",
+    title: "Inclusive Education",
+    category: "Education Elective",
+    credits: 4,
+    l: 3,
+    t: 1,
+    p: 0,
+    duration: 60,
+    lab: false,
+  },
+  {
+    code: "ED425",
+    title: "Digital Pedagogy",
+    category: "Education Elective",
+    credits: 4,
+    l: 2,
+    t: 0,
+    p: 2,
+    duration: 60,
+    lab: true,
+  },
+  {
+    code: "ED502",
+    title: "Educational Leadership",
+    category: "M.Ed. Core",
+    credits: 4,
+    l: 4,
+    t: 0,
+    p: 0,
+    duration: 60,
+    lab: false,
+  },
+  {
+    code: "ED510",
+    title: "Quantitative Research Methods",
+    category: "Research Methodology",
+    credits: 4,
+    l: 3,
     t: 0,
     p: 1,
     duration: 60,
     lab: true,
   },
+  {
+    code: "CS301",
+    title: "Algorithms",
+    category: "Subject Major",
+    credits: 4,
+    l: 3,
+    t: 1,
+    p: 0,
+    duration: 60,
+    lab: false,
+  },
+  {
+    code: "ED390",
+    title: "Practicum Review Seminar",
+    category: "Practicum",
+    credits: 2,
+    l: 0,
+    t: 2,
+    p: 0,
+    duration: 60,
+    lab: false,
+  },
+  {
+    code: "ED301",
+    title: "Sociological Perspectives in Education",
+    category: "Education Core",
+    credits: 4,
+    l: 4,
+    t: 0,
+    p: 0,
+    duration: 60,
+    lab: false,
+  },
 ];
 
 const seedOfferings = [
   {
-    id: "EDU201-SEM3",
-    course: "EDU201",
+    id: "ED201-SEM3",
+    course: "ED201",
     semester: 3,
-    expected: 80,
-    instructors: ["Dr. Rao", "Ms. Nair"],
-    roomType: "Lecture",
-    minCapacity: 100,
-    equipment: [],
-    sessions: { L: 3, T: 0, P: 0 },
+    expected: 45,
+    instructors: ["Dr. Priya Sharma", "Prof. Rajesh Kumar"],
+    roomType: "Lecture Hall",
+    minCapacity: 50,
+    equipment: ["Projector", "Smart Board"],
+    sessions: { L: 4, T: 0, P: 0 },
   },
   {
-    id: "CSC214-SEM3",
-    course: "CSC214",
+    id: "ED342-SEM3",
+    course: "ED342",
     semester: 3,
-    expected: 40,
-    instructors: ["Mr. Khan"],
-    roomType: "Lab",
-    minCapacity: 25,
-    equipment: ["PCs"],
-    sessions: { L: 0, T: 0, P: 2 },
+    expected: 30,
+    instructors: ["Dr. Anita Desai"],
+    roomType: "Pedagogy Lab",
+    minCapacity: 35,
+    equipment: ["Computers", "Teaching Aids"],
+    sessions: { L: 2, T: 0, P: 2 },
   },
   {
-    id: "MDC105-SEM2",
-    course: "MDC105",
+    id: "ED331-SEM2",
+    course: "ED331",
     semester: 2,
-    expected: 60,
-    instructors: ["Dr. Sen"],
-    roomType: "Lecture",
-    minCapacity: 80,
-    equipment: [],
-    sessions: { L: 2, T: 1, P: 0 },
+    expected: 40,
+    instructors: ["Dr. Vikram Singh", "Ms. Neha Patel"],
+    roomType: "Partner School",
+    minCapacity: 40,
+    equipment: ["Observation Kits"],
+    sessions: { L: 0, T: 0, P: 4 },
+  },
+  {
+    id: "CS203-SEM3",
+    course: "CS203",
+    semester: 3,
+    expected: 35,
+    instructors: ["Prof. Suresh Iyer"],
+    roomType: "Lecture Hall",
+    minCapacity: 40,
+    equipment: ["Projector"],
+    sessions: { L: 3, T: 1, P: 0 },
+  },
+  {
+    id: "ED215-SEM2",
+    course: "ED215",
+    semester: 2,
+    expected: 42,
+    instructors: ["Dr. Meera Verma"],
+    roomType: "Lecture Hall",
+    minCapacity: 50,
+    equipment: ["Projector", "Audio System"],
+    sessions: { L: 4, T: 0, P: 0 },
+  },
+  {
+    id: "ED501-SEM1",
+    course: "ED501",
+    semester: 1,
+    expected: 12,
+    instructors: ["Dr. Arun Kapoor"],
+    roomType: "Research Lab",
+    minCapacity: 15,
+    equipment: ["Computers", "SPSS Software"],
+    sessions: { L: 4, T: 0, P: 0 },
   },
 ];
 
@@ -242,7 +447,7 @@ export default function CoursesOfferings() {
       semester: "",
       expected: "",
       instructors: [],
-      roomType: "Lecture",
+      roomType: "Lecture Hall",
       minCapacity: "",
       equipment: [],
       sessions: { L: course.l, T: course.t, P: course.p },
@@ -285,32 +490,44 @@ export default function CoursesOfferings() {
 
   const getCategoryColor = (category) => {
     const colors = {
-      Major: isDark
-        ? "bg-blue-100 text-blue-700 border-blue-200"
-        : "bg-blue-500/20 text-blue-300 border-blue-400/40",
-      Minor: isDark
-        ? "bg-violet-100 text-violet-700 border-violet-200"
-        : "bg-violet-500/20 text-violet-300 border-violet-400/40",
-      MDC: isDark
-        ? "bg-indigo-100 text-indigo-700 border-indigo-200"
-        : "bg-indigo-500/20 text-indigo-300 border-indigo-400/40",
-      AEC: isDark
-        ? "bg-emerald-100 text-emerald-700 border-emerald-200"
-        : "bg-emerald-500/20 text-emerald-300 border-emerald-400/40",
-      SEC: isDark
-        ? "bg-amber-100 text-amber-700 border-amber-200"
-        : "bg-amber-500/20 text-amber-300 border-amber-400/40",
-      VAC: isDark
-        ? "bg-pink-100 text-pink-700 border-pink-200"
-        : "bg-pink-500/20 text-pink-300 border-pink-400/40",
-      Internship: isDark
-        ? "bg-cyan-100 text-cyan-700 border-cyan-200"
-        : "bg-cyan-500/20 text-cyan-300 border-cyan-400/40",
-      Research: isDark
-        ? "bg-rose-100 text-rose-700 border-rose-200"
-        : "bg-rose-500/20 text-rose-300 border-rose-400/40",
+      "Education Core": isDark
+        ? "bg-blue-500/20 text-blue-300 border-blue-400/40"
+        : "bg-blue-100 text-blue-700 border-blue-200",
+
+      "Subject Pedagogy": isDark
+        ? "bg-amber-500/20 text-amber-300 border-amber-400/40"
+        : "bg-amber-100 text-amber-700 border-amber-200",
+
+      "Subject Major": isDark
+        ? "bg-emerald-500/20 text-emerald-300 border-emerald-400/40"
+        : "bg-emerald-100 text-emerald-700 border-emerald-200",
+
+      "Subject Minor": isDark
+        ? "bg-cyan-500/20 text-cyan-300 border-cyan-400/40"
+        : "bg-cyan-100 text-cyan-700 border-cyan-200",
+
+      Practicum: isDark
+        ? "bg-rose-500/20 text-rose-300 border-rose-400/40"
+        : "bg-rose-100 text-rose-700 border-rose-200",
+
+      "Education Elective": isDark
+        ? "bg-violet-500/20 text-violet-300 border-violet-400/40"
+        : "bg-violet-100 text-violet-700 border-violet-200",
+
+      "Foundation Course": isDark
+        ? "bg-indigo-500/20 text-indigo-300 border-indigo-400/40"
+        : "bg-indigo-100 text-indigo-700 border-indigo-200",
+
+      "M.Ed. Core": isDark
+        ? "bg-purple-500/20 text-purple-300 border-purple-400/40"
+        : "bg-purple-100 text-purple-700 border-purple-200",
+
+      "Research Methodology": isDark
+        ? "bg-pink-500/20 text-pink-300 border-pink-400/40"
+        : "bg-pink-100 text-pink-700 border-pink-200",
     };
-    return colors[category] || colors.Major;
+
+    return colors[category] || colors["Education Core"];
   };
 
   return (
@@ -327,15 +544,18 @@ export default function CoursesOfferings() {
               isDark ? "bg-indigo-100" : "bg-indigo-500/20"
             }`}
           >
-            <Sparkles
+            <School
               size={24}
               className={isDark ? "text-indigo-600" : "text-indigo-400"}
             />
           </div>
           <div>
-            <h1 className="text-3xl font-bold mb-2">Courses & Offerings</h1>
+            <h1 className="text-3xl font-bold mb-2">
+              Teacher Education Course Catalog
+            </h1>
             <p className={`text-sm ${theme.mutedText}`}>
-              Manage course catalog and create semester offerings for scheduling
+              Manage ITEP, B.Ed., and M.Ed. courses with integrated curriculum
+              planning
             </p>
           </div>
         </div>
@@ -375,7 +595,9 @@ export default function CoursesOfferings() {
             />
           </div>
 
-          <select
+          <CustomDropdown
+            name="category"
+            id="filter-category"
             value={filters.cat}
             onChange={(e) =>
               setState((s) => ({
@@ -383,13 +605,10 @@ export default function CoursesOfferings() {
                 filters: { ...s.filters, cat: e.target.value },
               }))
             }
-            className={`w-full px-4 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all appearance-none`}
-          >
-            <option>All</option>
-            {CATEGORY_OPTIONS.map((o) => (
-              <option key={o}>{o}</option>
-            ))}
-          </select>
+            options={["All", ...CATEGORY_OPTIONS]}
+            theme={isDark ? "dark" : "light"}
+            placeholder="Select category"
+          />
 
           <input
             type="number"
@@ -417,7 +636,9 @@ export default function CoursesOfferings() {
             className={`w-full px-4 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
           />
 
-          <select
+          <CustomDropdown
+            name="hasLab"
+            id="filter-lab"
             value={filters.hasLab}
             onChange={(e) =>
               setState((s) => ({
@@ -425,12 +646,10 @@ export default function CoursesOfferings() {
                 filters: { ...s.filters, hasLab: e.target.value },
               }))
             }
-            className={`w-full px-4 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all appearance-none`}
-          >
-            <option>All</option>
-            <option>Yes</option>
-            <option>No</option>
-          </select>
+            options={["All", "Yes", "No"]}
+            theme={isDark ? "dark" : "light"}
+            placeholder="Lab filter"
+          />
         </div>
       </motion.section>
 
@@ -470,7 +689,6 @@ export default function CoursesOfferings() {
                   "L–T–P",
                   "Duration",
                   "Tags",
-                  "Actions",
                 ].map((h) => (
                   <th
                     key={h}
@@ -530,8 +748,8 @@ export default function CoursesOfferings() {
                           <span
                             className={`flex items-center justify-center w-7 h-7 rounded text-xs font-medium ${
                               isDark
-                                ? "bg-blue-100 text-blue-700"
-                                : "bg-blue-500/20 text-blue-300"
+                                ? "bg-blue-500/20 text-blue-300"
+                                : "bg-blue-100 text-blue-700"
                             }`}
                           >
                             {c.l}L
@@ -541,8 +759,8 @@ export default function CoursesOfferings() {
                           <span
                             className={`flex items-center justify-center w-7 h-7 rounded text-xs font-medium ${
                               isDark
-                                ? "bg-purple-100 text-purple-700"
-                                : "bg-purple-500/20 text-purple-300"
+                                ? "bg-purple-500/20 text-purple-300"
+                                : "bg-purple-100 text-purple-700"
                             }`}
                           >
                             {c.t}T
@@ -552,8 +770,8 @@ export default function CoursesOfferings() {
                           <span
                             className={`flex items-center justify-center w-7 h-7 rounded text-xs font-medium ${
                               isDark
-                                ? "bg-emerald-100 text-emerald-700"
-                                : "bg-emerald-500/20 text-emerald-300"
+                                ? "bg-emerald-500/20 text-emerald-300"
+                                : "bg-emerald-100 text-emerald-700"
                             }`}
                           >
                             {c.p}P
@@ -572,8 +790,8 @@ export default function CoursesOfferings() {
                         <span
                           className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium ${
                             isDark
-                              ? "bg-emerald-100 text-emerald-700 border-emerald-200"
-                              : "bg-emerald-500/20 text-emerald-300 border-emerald-400/40"
+                              ? "bg-emerald-500/20 text-emerald-300 border-emerald-400/40"
+                              : "bg-emerald-100 text-emerald-700 border-emerald-200"
                           }`}
                         >
                           <FlaskConical size={14} />
@@ -583,25 +801,10 @@ export default function CoursesOfferings() {
                         "—"
                       )}
                     </td>
-                    <td className="px-4 py-4">
-                      <motion.button
-                        onClick={() => openDrawer(c)}
-                        className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border ${
-                          isDark
-                            ? "bg-indigo-100 text-indigo-700 border-indigo-200 hover:bg-indigo-200"
-                            : "bg-indigo-500/20 text-indigo-300 border-indigo-400/40 hover:bg-indigo-500/30"
-                        } transition-colors`}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <Calendar size={14} />
-                        Manage
-                      </motion.button>
-                    </td>
                   </motion.tr>
                 ))
               )}
-            </tbody>
+            </tbody>  
           </table>
         </div>
       </motion.section>

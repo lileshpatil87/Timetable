@@ -18,7 +18,6 @@ import {
 
 const menuItems = [
   { title: "Dashboard", url: "/hod", icon: LayoutDashboard },
-  { title: "Programs", url: "/hod/programs", icon: GraduationCap },
   { title: "Courses", url: "/hod/courses", icon: BookOpen },
   { title: "Faculty", url: "/hod/faculties", icon: UsersRound },
   { title: "Students", url: "/hod/students", icon: UserCheck },

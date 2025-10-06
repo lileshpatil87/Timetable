@@ -114,41 +114,40 @@ export default function ApprovalQueue() {
 
   const getStatusColor = (status) => {
     if (status === "Approved") {
-      return isDark
+      return !isDark
         ? "bg-emerald-100 text-emerald-700 border-emerald-200"
         : "bg-emerald-500/20 text-emerald-300 border-emerald-500/30";
     }
     if (status === "Rejected") {
-      return isDark
+      return !isDark
         ? "bg-rose-100 text-rose-700 border-rose-200"
         : "bg-rose-500/20 text-rose-300 border-rose-500/30";
     }
     if (status === "Changes requested") {
-      return isDark
+      return !isDark
         ? "bg-amber-100 text-amber-700 border-amber-200"
         : "bg-amber-500/20 text-amber-300 border-amber-500/30";
     }
-    return isDark
+    return !isDark
       ? "bg-gray-100 text-gray-700 border-gray-200"
       : "bg-slate-700/50 text-slate-300 border-slate-600";
   };
 
   const getPriorityColor = (priority) => {
     if (priority === "high") {
-      return isDark
+      return !isDark
         ? "bg-rose-100 text-rose-700"
         : "bg-rose-500/20 text-rose-300";
     }
     if (priority === "medium") {
-      return isDark
+      return !isDark
         ? "bg-amber-100 text-amber-700"
         : "bg-amber-500/20 text-amber-300";
     }
-    return isDark
+    return !isDark
       ? "bg-blue-100 text-blue-700"
       : "bg-blue-500/20 text-blue-300";
   };
-
   return (
     <div className="space-y-8">
       {/* Page Header */}
@@ -408,7 +407,7 @@ export default function ApprovalQueue() {
                           <motion.button
                             onClick={() => actApproval(a.id, "Approved")}
                             className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-all flex items-center gap-1.5 ${
-                              isDark
+                              !isDark
                                 ? "border-emerald-300 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
                                 : "border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
                             }`}
@@ -423,7 +422,7 @@ export default function ApprovalQueue() {
                               actApproval(a.id, "Changes requested")
                             }
                             className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-all flex items-center gap-1.5 ${
-                              isDark
+                              !isDark
                                 ? "border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100"
                                 : "border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20"
                             }`}
@@ -436,7 +435,7 @@ export default function ApprovalQueue() {
                           <motion.button
                             onClick={() => actApproval(a.id, "Rejected")}
                             className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-all flex items-center gap-1.5 ${
-                              isDark
+                              !isDark
                                 ? "border-rose-300 bg-rose-50 text-rose-700 hover:bg-rose-100"
                                 : "border-rose-500/30 bg-rose-500/10 text-rose-300 hover:bg-rose-500/20"
                             }`}

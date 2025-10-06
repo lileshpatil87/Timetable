@@ -16,7 +16,7 @@
 }
 
 /* select reset */
-select {
+/* select {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
@@ -25,9 +25,9 @@ select {
 }
 
 /* optional: hide Edge/IE arrow */
-select::-ms-expand {
+/* select::-ms-expand {
   display: none;
-}
+} */ 
 
 /* :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;

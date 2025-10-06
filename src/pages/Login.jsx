@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -8,17 +8,26 @@ import {
   EyeOffIcon,
   ArrowRightIcon,
   CalendarDaysIcon,
+  ChevronDownIcon,
+  CheckIcon,
   Sun,
   Moon,
 } from "lucide-react";
 
-const ROLES = ["Student", "Faculty", "HOD", "Dean", "Staff"];
+const ROLES = [
+  "Student",
+  "Faculty",
+  "Timetable Coordinators",
+  "Head of the Department",
+  "Academic Dean",
+];
 
 export default function Login() {
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem("theme") || "dark";
   });
   const [showPwd, setShowPwd] = useState(false);
+  const [isRoleOpen, setIsRoleOpen] = useState(false);
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -31,15 +40,32 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname;
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     localStorage.setItem("theme", theme);
     document.documentElement.classList.toggle("light", theme === "light");
   }, [theme]);
 
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsRoleOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const toggleTheme = () => {
     setTheme((prev) => (prev === "dark" ? "light" : "dark"));
   };
+
+  function selectRole(role) {
+    setForm((f) => ({ ...f, role }));
+    setErrors((er) => ({ ...er, role: "" }));
+    setIsRoleOpen(false);
+  }
 
   function onChange(e) {
     const { name, value } = e.target;
@@ -67,9 +93,9 @@ export default function Login() {
     const routes = {
       Student: "/student",
       Faculty: "/faculty",
-      HOD: "/hod",
-      Dean: "/dean",
-      Staff: "/staff",
+      "Timetable Coordinators": "/coordinator",
+      "Head of the Department": "/hod",
+      "Academic Dean": "/dean",
     };
     navigate(routes[role] || "/student", { replace: true });
   }
@@ -334,8 +360,8 @@ export default function Login() {
               </div>
             </motion.div>
 
-            {/* Role */}
-            <motion.div variants={fadeInUp}>
+            {/* Custom Role Dropdown */}
+            <motion.div variants={fadeInUp} ref={dropdownRef}>
               <label
                 htmlFor="role"
                 className={`block text-sm font-medium mb-1.5 ${
@@ -344,40 +370,73 @@ export default function Login() {
               >
                 Role
               </label>
-              <select
-                id="role"
-                name="role"
-                value={form.role}
-                onChange={onChange}
-                required
-                className={`w-full rounded-xl px-3 py-2.5 pr-10 appearance-none transition-all duration-200 ${
-                  theme === "dark"
-                    ? "border bg-slate-800/50 text-slate-100 focus:ring-2 focus:ring-indigo-400/50"
-                    : "border bg-white text-gray-900 focus:ring-2 focus:ring-indigo-500"
-                } ${
-                  errors.role
-                    ? theme === "dark"
-                      ? "border-red-500/60"
-                      : "border-red-400"
-                    : theme === "dark"
-                    ? "border-slate-700/50"
-                    : "border-gray-300"
-                }`}
-                style={{
-                  backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='${
-                    theme === "dark" ? "%2394a3b8" : "%236b7280"
-                  }'><path fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/></svg>")`,
-                  backgroundRepeat: "no-repeat",
-                  backgroundPosition: "right 0.75rem center",
-                  backgroundSize: "1.25rem 1.25rem",
-                }}
-              >
-                {ROLES.map((r) => (
-                  <option key={r} value={r}>
-                    {r}
-                  </option>
-                ))}
-              </select>
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setIsRoleOpen(!isRoleOpen)}
+                  className={`w-full rounded-xl px-3 py-2.5 pr-10 text-left transition-all duration-200 ${
+                    theme === "dark"
+                      ? "border bg-slate-800/50 text-slate-100 focus:ring-2 focus:ring-indigo-400/50"
+                      : "border bg-white text-gray-900 focus:ring-2 focus:ring-indigo-500"
+                  } ${
+                    errors.role
+                      ? theme === "dark"
+                        ? "border-red-500/60"
+                        : "border-red-400"
+                      : theme === "dark"
+                      ? "border-slate-700/50"
+                      : "border-gray-300"
+                  }`}
+                >
+                  {form.role}
+                  <ChevronDownIcon
+                    className={`absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 transition-transform ${
+                      isRoleOpen ? "rotate-180" : ""
+                    } ${theme === "dark" ? "text-slate-500" : "text-gray-400"}`}
+                  />
+                </button>
+
+                {/* Dropdown Menu */}
+                {isRoleOpen && (
+                  <div
+                    className={`absolute z-50 w-full mt-2 rounded-xl shadow-lg overflow-hidden border ${
+                      theme === "dark"
+                        ? "bg-slate-800 border-slate-700"
+                        : "bg-white border-gray-200"
+                    }`}
+                  >
+                    {ROLES.map((role) => (
+                      <button
+                        key={role}
+                        type="button"
+                        onClick={() => selectRole(role)}
+                        className={`w-full px-3 py-2.5 text-left flex items-center justify-between transition-colors ${
+                          theme === "dark"
+                            ? "hover:bg-slate-700/50 text-slate-100"
+                            : "hover:bg-gray-50 text-gray-900"
+                        } ${
+                          form.role === role
+                            ? theme === "dark"
+                              ? "bg-slate-700/30"
+                              : "bg-indigo-50"
+                            : ""
+                        }`}
+                      >
+                        <span>{role}</span>
+                        {form.role === role && (
+                          <CheckIcon
+                            className={`h-4 w-4 ${
+                              theme === "dark"
+                                ? "text-indigo-400"
+                                : "text-indigo-600"
+                            }`}
+                          />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
               {errors.role && (
                 <p
                   className={`mt-1.5 text-xs flex items-center gap-1 ${

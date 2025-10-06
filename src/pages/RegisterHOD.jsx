@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import CustomDropdown from "../components/CustomDropdown";
+
 import {
   User,
   AtSign,
@@ -300,17 +302,18 @@ export default function RegisterHOD() {
               Department & Permissions
             </h2>
             <div className="space-y-5">
-              <SelectField
-                id="department"
-                label="Department"
-                icon={<Building2 className="h-5 w-5" />}
-                value={form.department}
-                onChange={(v) => onChange("department", v)}
-                options={DEPARTMENTS}
-                error={errors.department}
-                theme={theme}
-                isDark={isDark}
-              />
+              <div>
+                <CustomDropdown
+                  label="Department"
+                  name="department"
+                  id="department"
+                  value={form.department}
+                  onChange={(e) => onChange("department", e.target.value)}
+                  options={["", ...DEPARTMENTS]}
+                  error={errors.department}
+                  theme={isDark ? "dark" : "light"}
+                />
+              </div>
 
               <motion.label
                 className={`inline-flex items-center gap-3 p-4 rounded-xl border ${theme.cardBorder} ${theme.accentBg} text-sm cursor-pointer ${theme.hoverBg} transition-colors`}

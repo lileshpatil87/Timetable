@@ -118,37 +118,37 @@ export default function ReportedClashes() {
 
   const getStatusColor = (status) => {
     if (status === "New") {
-      return isDark
+      return !isDark
         ? "bg-rose-100 text-rose-700 border-rose-200"
         : "bg-rose-500/20 text-rose-300 border-rose-500/30";
     }
     if (status === "Investigating") {
-      return isDark
+      return !isDark
         ? "bg-amber-100 text-amber-700 border-amber-200"
         : "bg-amber-500/20 text-amber-300 border-amber-500/30";
     }
-    return isDark
+    return !isDark
       ? "bg-emerald-100 text-emerald-700 border-emerald-200"
       : "bg-emerald-500/20 text-emerald-300 border-emerald-500/30";
   };
 
   const getSeverityColor = (severity) => {
     if (severity === "critical") {
-      return isDark
+      return !isDark
         ? "bg-rose-100 text-rose-700"
         : "bg-rose-500/20 text-rose-300";
     }
     if (severity === "high") {
-      return isDark
+      return !isDark
         ? "bg-orange-100 text-orange-700"
         : "bg-orange-500/20 text-orange-300";
     }
     if (severity === "medium") {
-      return isDark
+      return !isDark
         ? "bg-amber-100 text-amber-700"
         : "bg-amber-500/20 text-amber-300";
     }
-    return isDark
+    return !isDark
       ? "bg-blue-100 text-blue-700"
       : "bg-blue-500/20 text-blue-300";
   };
@@ -412,7 +412,7 @@ export default function ReportedClashes() {
                             <motion.button
                               onClick={() => updateClash(c.id, "Investigating")}
                               className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-all flex items-center gap-1.5 ${
-                                isDark
+                                !isDark
                                   ? "border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100"
                                   : "border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20"
                               }`}
@@ -426,7 +426,7 @@ export default function ReportedClashes() {
                           <motion.button
                             onClick={() => updateClash(c.id, "Resolved")}
                             className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-all flex items-center gap-1.5 ${
-                              isDark
+                              !isDark
                                 ? "border-emerald-300 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
                                 : "border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
                             }`}

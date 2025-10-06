@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import HODSidebar from "./HODSidebar";
 import DeanSidebar from "./DeanSidebar";
+import CoordinatorSidebar from "./CoordinatorSidebar"; // Add this import
 
 export function DashboardLayout({ role = "hod" }) {
   const navigate = useNavigate();
@@ -32,7 +33,12 @@ export function DashboardLayout({ role = "hod" }) {
   }
 
   // Select sidebar component based on role
-  const SidebarComponent = role === "dean" ? DeanSidebar : HODSidebar;
+  const SidebarComponent =
+    role === "dean"
+      ? DeanSidebar
+      : role === "coordinator"
+      ? CoordinatorSidebar
+      : HODSidebar;
 
   // Theme classes
   const theme = {
@@ -77,6 +83,7 @@ export function DashboardLayout({ role = "hod" }) {
   const roleDisplay = {
     hod: "Head of Department",
     dean: "Dean",
+    coordinator: "Timetable Coordinator", // Add coordinator display name
   };
 
   return (

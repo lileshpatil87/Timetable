@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import CustomDropdown from "../components/CustomDropdown";
+
 import {
   LogOut,
   Building2,
@@ -935,18 +937,17 @@ export default function DeanDashboard() {
                   }
                   className={`rounded-lg border ${theme.cardBorder} ${theme.cardBg} px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
                 />
-                <select
+                <CustomDropdown
+                  name="type"
+                  id="room-type"
                   value={newRoom.type}
                   onChange={(e) =>
                     setNewRoom((r) => ({ ...r, type: e.target.value }))
                   }
-                  className={`rounded-lg border ${theme.cardBorder} ${theme.cardBg} px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all appearance-none`}
-                >
-                  <option>Lecture</option>
-                  <option>Lab</option>
-                  <option>Studio</option>
-                  <option>Seminar</option>
-                </select>
+                  options={["Lecture", "Lab", "Studio", "Seminar"]}
+                  theme={isDark ? "dark" : "light"}
+                  placeholder="Room type"
+                />
                 <input
                   type="number"
                   placeholder="Capacity"
@@ -967,18 +968,17 @@ export default function DeanDashboard() {
                   }
                   className={`rounded-lg border ${theme.cardBorder} ${theme.cardBg} px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
                 />
-                <select
+                <CustomDropdown
+                  name="owner"
+                  id="room-owner"
                   value={newRoom.owner}
                   onChange={(e) =>
                     setNewRoom((r) => ({ ...r, owner: e.target.value }))
                   }
-                  className={`rounded-lg border ${theme.cardBorder} ${theme.cardBg} px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all appearance-none`}
-                >
-                  <option>Central</option>
-                  <option>CS Dept</option>
-                  <option>EE Dept</option>
-                  <option>ME Dept</option>
-                </select>
+                  options={["Central", "CS Dept", "EE Dept", "ME Dept"]}
+                  theme={isDark ? "dark" : "light"}
+                  placeholder="Owner"
+                />
               </div>
 
               {/* Action Buttons */}

@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import CustomDropdown from "../components/CustomDropdown";
+
 import {
   Search,
   Filter,
@@ -325,32 +327,30 @@ export default function StudentsEnrollments() {
           </div>
 
           {/* Department Filter */}
-          <select
+          <CustomDropdown
+            name="department"
+            id="filter-department"
             value={filters.dept}
             onChange={(e) =>
               setFilters((f) => ({ ...f, dept: e.target.value }))
             }
-            className={`w-full px-4 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all appearance-none`}
-          >
-            <option>All</option>
-            {DEPARTMENTS.map((d) => (
-              <option key={d}>{d}</option>
-            ))}
-          </select>
+            options={["All", ...DEPARTMENTS]}
+            theme={isDark ? "dark" : "light"}
+            placeholder="Department"
+          />
 
           {/* Year Filter */}
-          <select
+          <CustomDropdown
+            name="year"
+            id="filter-year"
             value={filters.year}
             onChange={(e) =>
               setFilters((f) => ({ ...f, year: e.target.value }))
             }
-            className={`w-full px-4 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all appearance-none`}
-          >
-            <option>All</option>
-            {YEARS.map((y) => (
-              <option key={y}>{y}</option>
-            ))}
-          </select>
+            options={["All", ...YEARS.map(String)]}
+            theme={isDark ? "dark" : "light"}
+            placeholder="Year"
+          />
 
           {/* ABC ID Filter */}
           <label className="flex items-center gap-2 cursor-pointer">
@@ -444,7 +444,7 @@ export default function StudentsEnrollments() {
                     <motion.button
                       onClick={() => openCohort(c)}
                       className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
-                        isDark
+                        !isDark
                           ? "bg-indigo-100 text-indigo-700 border-indigo-200 hover:bg-indigo-200"
                           : "bg-indigo-500/20 text-indigo-300 border-indigo-400/40 hover:bg-indigo-500/30"
                       }`}
@@ -544,7 +544,7 @@ export default function StudentsEnrollments() {
                     <motion.button
                       onClick={() => openStudent(st)}
                       className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
-                        isDark
+                        !isDark
                           ? "bg-indigo-100 text-indigo-700 border-indigo-200 hover:bg-indigo-200"
                           : "bg-indigo-500/20 text-indigo-300 border-indigo-400/40 hover:bg-indigo-500/30"
                       }`}

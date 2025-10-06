@@ -1,6 +1,7 @@
 // src/pages/ScenarioComposer.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import CustomDropdown from "../components/CustomDropdown";
 
 function loadFramework() {
   const s = localStorage.getItem("programsFramework");
@@ -267,18 +268,21 @@ export default function ScenarioComposer() {
                   onChange={(e) => setTimeBudgetMin(Number(e.target.value))}
                 />
               </label>
-              <label className="grid gap-1">
-                <span>Profile</span>
-                <select
-                  className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2"
+              <div>
+                <CustomDropdown
+                  label="Profile"
+                  name="profile"
+                  id="scenario-profile"
                   value={profile}
                   onChange={(e) => setProfile(e.target.value)}
-                >
-                  <option>Student-centric</option>
-                  <option>Faculty fairness</option>
-                  <option>Infrastructure utilization</option>
-                </select>
-              </label>
+                  options={[
+                    "Student-centric",
+                    "Faculty fairness",
+                    "Infrastructure utilization",
+                  ]}
+                  theme="dark"
+                />
+              </div>
             </div>
 
             <div className="mt-3 flex justify-end">

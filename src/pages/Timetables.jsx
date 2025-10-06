@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import CustomDropdown from "../components/CustomDropdown";
+
 import {
   Users,
   User,
@@ -352,58 +354,32 @@ export default function Timetables() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {/* View By */}
           <div className="space-y-2">
-            <label className="block text-sm font-semibold">View By</label>
-            <div className="relative">
-              <div
-                className={`absolute left-3 top-1/2 -translate-y-1/2 ${theme.mutedText}`}
-              >
-                {getViewIcon()}
-              </div>
-              <select
-                className={`w-full appearance-none pl-10 pr-10 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
-                value={view}
-                onChange={(e) => {
-                  setView(e.target.value);
-                  setSelectedEntity("");
-                }}
-              >
-                <option>Program</option>
-                <option>Faculty</option>
-                <option>Room</option>
-              </select>
-              <ChevronDown
-                size={16}
-                className={`absolute right-3 top-1/2 -translate-y-1/2 ${theme.mutedText} pointer-events-none`}
-              />
-            </div>
+            <CustomDropdown
+              label="View By"
+              name="view"
+              id="timetable-view"
+              value={view}
+              onChange={(e) => {
+                setView(e.target.value);
+                setSelectedEntity("");
+              }}
+              options={["Program", "Faculty", "Room"]}
+              theme={isDark ? "dark" : "light"}
+            />
           </div>
 
           {/* Entity Selector */}
           <div className="space-y-2">
-            <label className="block text-sm font-semibold">
-              {view} Selector
-            </label>
-            <div className="relative">
-              <div
-                className={`absolute left-3 top-1/2 -translate-y-1/2 ${theme.mutedText}`}
-              >
-                {getViewIcon()}
-              </div>
-              <select
-                className={`w-full appearance-none pl-10 pr-10 py-2.5 rounded-lg border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all`}
-                value={selectedEntity}
-                onChange={(e) => setSelectedEntity(e.target.value)}
-              >
-                <option value="">All</option>
-                {entities.map((x) => (
-                  <option key={x}>{x}</option>
-                ))}
-              </select>
-              <ChevronDown
-                size={16}
-                className={`absolute right-3 top-1/2 -translate-y-1/2 ${theme.mutedText} pointer-events-none`}
-              />
-            </div>
+            <CustomDropdown
+              label={`${view} Selector`}
+              name="entity"
+              id="timetable-entity"
+              value={selectedEntity}
+              onChange={(e) => setSelectedEntity(e.target.value)}
+              options={["", ...entities]}
+              theme={isDark ? "dark" : "light"}
+              placeholder={`All ${view}s`}
+            />
           </div>
 
           {/* Search */}

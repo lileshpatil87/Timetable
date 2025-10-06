@@ -16,6 +16,7 @@ import {
   FileWarningIcon,
   TrendingUpIcon,
 } from "lucide-react";
+import CustomDropdown from "../components/CustomDropdown";
 
 const seedConflicts = [
   {
@@ -176,7 +177,6 @@ export default function ConflictExplorer() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 to-slate-900 text-slate-100">
-
       {/* Page Header */}
       <div className="max-w-[1280px] mx-auto px-6 pb-6">
         <h1 className="text-3xl font-extrabold mb-3 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
@@ -216,99 +216,41 @@ export default function ConflictExplorer() {
                 className="w-full rounded-lg border border-slate-700 bg-slate-800/70 pl-10 pr-4 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
               />
             </div>
-            <div className="relative">
-              <select
-                value={filters.type}
-                onChange={(e) =>
-                  setFilters((f) => ({ ...f, type: e.target.value }))
-                }
-                className="w-full appearance-none rounded-lg border border-slate-700 bg-slate-800/70 pl-10 pr-10 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-              >
-                {TYPES.map((x) => (
-                  <option key={x}>{x}</option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                <LayoutGridIcon size={16} />
-              </div>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500">
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </div>
-            </div>
-            <div className="relative">
-              <select
-                value={filters.severity}
-                onChange={(e) =>
-                  setFilters((f) => ({ ...f, severity: e.target.value }))
-                }
-                className="w-full appearance-none rounded-lg border border-slate-700 bg-slate-800/70 pl-10 pr-10 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-              >
-                {SEVERITIES.map((x) => (
-                  <option key={x}>{x}</option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                <TrendingUpIcon size={16} />
-              </div>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500">
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </div>
-            </div>
-            <div className="relative">
-              <select
-                value={filters.status}
-                onChange={(e) =>
-                  setFilters((f) => ({ ...f, status: e.target.value }))
-                }
-                className="w-full appearance-none rounded-lg border border-slate-700 bg-slate-800/70 pl-10 pr-10 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-              >
-                {STATUSES.map((x) => (
-                  <option key={x}>{x}</option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                <CheckCircleIcon size={16} />
-              </div>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500">
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </div>
-            </div>
+            <CustomDropdown
+              name="type"
+              id="filter-type"
+              value={filters.type}
+              onChange={(e) =>
+                setFilters((f) => ({ ...f, type: e.target.value }))
+              }
+              options={TYPES}
+              theme="dark"
+              placeholder="Select type"
+            />
+
+            <CustomDropdown
+              name="severity"
+              id="filter-severity"
+              value={filters.severity}
+              onChange={(e) =>
+                setFilters((f) => ({ ...f, severity: e.target.value }))
+              }
+              options={SEVERITIES}
+              theme="dark"
+              placeholder="Select severity"
+            />
+
+            <CustomDropdown
+              name="status"
+              id="filter-status"
+              value={filters.status}
+              onChange={(e) =>
+                setFilters((f) => ({ ...f, status: e.target.value }))
+              }
+              options={STATUSES}
+              theme="dark"
+              placeholder="Select status"
+            />
           </div>
         </section>
 

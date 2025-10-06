@@ -1,6 +1,7 @@
 import React, { useState, Fragment } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import CustomDropdown from "../components/CustomDropdown";
 import {
   Calendar,
   LogOut,
@@ -25,118 +26,258 @@ import {
   TrendingUp,
   Award,
   BarChart3,
+  School,
+  ClipboardCheck,
+  UserCheck,
+  Brain,
+  Briefcase,
+  CheckCircle2,
+  AlertCircle,
+  MessageSquare,
+  Video,
+  Eye,
+  Star,
 } from "lucide-react";
 
-export default function FacultyDashboard() {
+export default function TeacherEducationFacultyDashboard() {
   const navigate = useNavigate();
   const [isDark, setIsDark] = useState(true);
   const [showExport, setShowExport] = useState(false);
   const [showAvailability, setShowAvailability] = useState(false);
   const [showClash, setShowClash] = useState(false);
+  const [showPracticumModal, setShowPracticumModal] = useState(false);
   const [selectedFormat, setSelectedFormat] = useState("PDF");
   const [availabilityBlocks, setAvailabilityBlocks] = useState([]);
+  const [availabilityForm, setAvailabilityForm] = useState({
+    day: "",
+    startTime: "",
+    endTime: "",
+  });
+  const [clashType, setClashType] = useState("Timetable Conflict");
 
-  // Demo faculty data
+  // Faculty data for ITEP/B.Ed./M.Ed. programs
   const faculty = {
-    name: "Dr. R. Rao",
-    id: "FAC-CS-014",
-    email: "r.rao@university.edu",
-    department: "Computer Science",
-    role: "Associate Professor",
+    name: "Dr. Priya Sharma",
+    id: "FAC-ED-024",
+    email: "priya.sharma@university.edu",
+    department: "School of Education",
+    role: "Associate Professor - Education",
+    program: "ITEP & B.Ed.",
+
+    // NEP 2020 Teaching Load (15-16 hours/week for teacher education)
     targetHours: 16,
     assignedHours: 14,
-    daysOnCampus: 4,
+    daysOnCampus: 5,
+
+    // Dual expertise
+    educationSpecialization: "Pedagogy & Curriculum Design",
+    subjectSpecialization: "Computer Science",
+    stageSpecialization: "Secondary Stage (Classes 9-12)",
+
+    // Practicum supervision
+    practicumLoad: {
+      studentsSupervised: 8,
+      schoolVisitsPending: 3,
+      nextVisit: "Oct 12, 2025",
+      totalHoursSupervised: 120,
+    },
+
+    // Research & mentorship
+    researchGuidance: {
+      mEdThesis: 2,
+      projects: 3,
+    },
   };
 
   // Week grid setup
   const weekDays = ["Mon", "Tue", "Wed", "Thu", "Fri"];
   const slots = ["09:00", "10:15", "11:30", "12:45", "14:00", "15:15", "16:30"];
 
-  // Faculty sessions
+  // Faculty sessions - ITEP/B.Ed. specific
   const sessions = {
     Mon: [
       {
         slotIndex: 0,
         len: 1,
-        title: "Data Structures",
+        title: "Learning & Teaching",
         type: "L",
-        room: "CS-201",
-        cohort: "FYUGP-CS-S3",
-        code: "CS201",
+        room: "ED-201",
+        cohort: "ITEP-Y2",
+        code: "ED201",
+        category: "Education Core",
+        students: 45,
       },
       {
         slotIndex: 2,
         len: 2,
-        title: "OS Lab",
+        title: "CS Pedagogy Lab",
         type: "P",
-        room: "CS-Lab-1",
-        cohort: "FYUGP-CS-S3",
-        code: "CS331",
+        room: "ED-Lab-2",
+        cohort: "ITEP-Y3",
+        code: "ED342",
+        category: "Subject Pedagogy",
+        students: 30,
+      },
+      {
+        slotIndex: 5,
+        len: 1,
+        title: "Practicum Supervision",
+        type: "S",
+        room: "DPS School",
+        cohort: "ITEP-Y2 (Field)",
+        code: "ED331",
+        category: "Practicum",
+        students: 8,
+        isFieldWork: true,
       },
     ],
     Tue: [
       {
-        slotIndex: 1,
+        slotIndex: 0,
         len: 1,
-        title: "Algorithms",
+        title: "Curriculum Design",
         type: "L",
-        room: "CS-105",
-        cohort: "FYUGP-CS-S3",
-        code: "CS301",
+        room: "ED-105",
+        cohort: "B.Ed-S2",
+        code: "ED215",
+        category: "Education Core",
+        students: 40,
       },
       {
-        slotIndex: 4,
+        slotIndex: 3,
         len: 2,
-        title: "Database Lab",
+        title: "Teaching Practice",
         type: "P",
-        room: "CS-Lab-2",
-        cohort: "FYUGP-CS-S3",
-        code: "CS302",
+        room: "Demo School",
+        cohort: "B.Ed-S3",
+        code: "ED302",
+        category: "Practicum",
+        students: 25,
+        isFieldWork: true,
       },
     ],
     Wed: [
       {
-        slotIndex: 0,
+        slotIndex: 1,
         len: 1,
-        title: "Data Structures",
-        type: "T",
-        room: "CS-201",
-        cohort: "FYUGP-CS-S3",
-        code: "CS201",
+        title: "Assessment of Learning",
+        type: "L",
+        room: "ED-301",
+        cohort: "ITEP-Y3",
+        code: "ED344",
+        category: "Education Core",
+        students: 38,
       },
       {
         slotIndex: 3,
         len: 1,
-        title: "Algorithms",
+        title: "Educational Psychology",
         type: "T",
-        room: "CS-204",
-        cohort: "FYUGP-CS-S3",
-        code: "CS301",
+        room: "ED-204",
+        cohort: "ITEP-Y2",
+        code: "ED225",
+        category: "Education Core",
+        students: 45,
+      },
+      {
+        slotIndex: 5,
+        len: 1,
+        title: "M.Ed. Research Seminar",
+        type: "S",
+        room: "Research Lab",
+        cohort: "M.Ed-S3",
+        code: "ED501",
+        category: "Research",
+        students: 12,
       },
     ],
     Thu: [
       {
-        slotIndex: 2,
-        len: 1,
-        title: "Research Seminar",
+        slotIndex: 0,
+        len: 2,
+        title: "School Observation",
         type: "S",
-        room: "Seminar Hall",
-        cohort: "All",
-        code: "RES101",
+        room: "Kendriya Vidyalaya",
+        cohort: "ITEP-Y1 (Field)",
+        code: "ED120",
+        category: "Practicum",
+        students: 15,
+        isFieldWork: true,
+      },
+      {
+        slotIndex: 4,
+        len: 1,
+        title: "Digital Pedagogy",
+        type: "L",
+        room: "ED-401",
+        cohort: "B.Ed-S4",
+        code: "ED425",
+        category: "Education Elective",
+        students: 30,
       },
     ],
     Fri: [
       {
         slotIndex: 1,
         len: 1,
-        title: "Database Systems",
-        type: "L",
-        room: "CS-104",
-        cohort: "FYUGP-CS-S3",
-        code: "CS302",
+        title: "Mathematics Pedagogy",
+        type: "T",
+        room: "ED-203",
+        cohort: "ITEP-Y3",
+        code: "ED345",
+        category: "Subject Pedagogy",
+        students: 35,
+      },
+      {
+        slotIndex: 3,
+        len: 2,
+        title: "Practicum Review",
+        type: "S",
+        room: "ED-Conference",
+        cohort: "All Programs",
+        code: "ED390",
+        category: "Practicum",
+        students: 50,
       },
     ],
   };
+
+  // Practicum students under supervision
+  const practicumStudents = [
+    {
+      id: "STU23ITEP015",
+      name: "Rahul Verma",
+      program: "ITEP-Y2",
+      school: "Delhi Public School",
+      hoursCompleted: 45,
+      totalHours: 120,
+      nextVisit: "Oct 12, 2025",
+      status: "On Track",
+      lastFeedback: "Excellent classroom management",
+    },
+    {
+      id: "STU23BED032",
+      name: "Anjali Reddy",
+      program: "B.Ed-S3",
+      school: "Kendriya Vidyalaya",
+      hoursCompleted: 32,
+      totalHours: 80,
+      nextVisit: "Oct 15, 2025",
+      status: "Needs Support",
+      lastFeedback: "Struggling with lesson planning",
+    },
+    {
+      id: "STU23ITEP028",
+      name: "Vikram Singh",
+      program: "ITEP-Y3",
+      school: "Sarvodaya School",
+      hoursCompleted: 78,
+      totalHours: 120,
+      nextVisit: "Oct 18, 2025",
+      status: "Excellent",
+      lastFeedback: "Strong pedagogical skills",
+    },
+  ];
 
   function handleLogout() {
     navigate("/login");
@@ -149,14 +290,18 @@ export default function FacultyDashboard() {
 
   const handleAddAvailability = (e) => {
     e.preventDefault();
-    const formData = new FormData(e.target);
-    const newBlock = {
-      day: formData.get("day"),
-      startTime: formData.get("startTime"),
-      endTime: formData.get("endTime"),
-    };
-    setAvailabilityBlocks([...availabilityBlocks, newBlock]);
-    e.target.reset();
+    if (
+      availabilityForm.day &&
+      availabilityForm.startTime &&
+      availabilityForm.endTime
+    ) {
+      setAvailabilityBlocks([...availabilityBlocks, availabilityForm]);
+      setAvailabilityForm({
+        day: "",
+        startTime: "",
+        endTime: "",
+      });
+    }
   };
 
   const handleRemoveAvailability = (index) => {
@@ -168,33 +313,43 @@ export default function FacultyDashboard() {
     setShowClash(false);
   };
 
-  // Session type colors
-  const getSessionColor = (type) => {
-    if (type === "L") {
+  // Session type colors - Enhanced for teacher education
+  const getSessionColor = (category, isFieldWork) => {
+    if (isFieldWork) {
+      return isDark
+        ? "bg-rose-50 border-rose-200 hover:border-rose-300"
+        : "bg-rose-500/10 border-rose-500/30 hover:border-rose-500/50";
+    }
+    if (category === "Education Core") {
       return isDark
         ? "bg-blue-50 border-blue-200 hover:border-blue-300"
         : "bg-blue-500/10 border-blue-500/30 hover:border-blue-500/50";
     }
-    if (type === "P") {
-      return isDark
-        ? "bg-emerald-50 border-emerald-200 hover:border-emerald-300"
-        : "bg-emerald-500/10 border-emerald-500/30 hover:border-emerald-500/50";
-    }
-    if (type === "T") {
+    if (category === "Subject Pedagogy") {
       return isDark
         ? "bg-amber-50 border-amber-200 hover:border-amber-300"
         : "bg-amber-500/10 border-amber-500/30 hover:border-amber-500/50";
     }
+    if (category === "Practicum") {
+      return isDark
+        ? "bg-emerald-50 border-emerald-200 hover:border-emerald-300"
+        : "bg-emerald-500/10 border-emerald-500/30 hover:border-emerald-500/50";
+    }
+    if (category === "Research") {
+      return isDark
+        ? "bg-purple-50 border-purple-200 hover:border-purple-300"
+        : "bg-purple-500/10 border-purple-500/30 hover:border-purple-500/50";
+    }
     return isDark
-      ? "bg-purple-50 border-purple-200 hover:border-purple-300"
-      : "bg-purple-500/10 border-purple-500/30 hover:border-purple-500/50";
+      ? "bg-gray-50 border-gray-200 hover:border-gray-300"
+      : "bg-gray-500/10 border-gray-500/30 hover:border-gray-500/50";
   };
 
   const getTypeLabel = (type) => {
     if (type === "L")
       return { text: "L", color: isDark ? "bg-blue-600" : "bg-blue-500" };
     if (type === "P")
-      return { text: "P", color: isDark ? "bg-emerald-600" : "bg-emerald-500" };
+      return { text: "P", color: isDark ? "bg-rose-600" : "bg-rose-500" };
     if (type === "T")
       return { text: "T", color: isDark ? "bg-amber-600" : "bg-amber-500" };
     return { text: "S", color: isDark ? "bg-purple-600" : "bg-purple-500" };
@@ -230,6 +385,8 @@ export default function FacultyDashboard() {
     tableHeader: isDark ? "bg-gray-50" : "bg-slate-800/40",
   };
 
+  const loadPercentage = (faculty.assignedHours / faculty.targetHours) * 100;
+
   return (
     <div
       className={`min-h-screen ${theme.bg} ${theme.text} transition-colors duration-300`}
@@ -258,9 +415,12 @@ export default function FacultyDashboard() {
             <div
               className={`p-1.5 rounded-lg bg-gradient-to-br ${theme.gradient}`}
             >
-              <Calendar className="h-4 w-4 text-white" />
+              <School className="h-4 w-4 text-white" />
             </div>
-            <span className="font-semibold text-lg">Timely NEP</span>
+            <div>
+              <span className="font-semibold text-lg">Timely NEP</span>
+              <p className={`text-xs ${theme.mutedText}`}>Faculty Dashboard</p>
+            </div>
           </Link>
 
           <div className="flex items-center gap-3">
@@ -307,143 +467,69 @@ export default function FacultyDashboard() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold mb-1">{faculty.name}</h1>
-                <p className={`text-sm ${theme.mutedText} mb-3`}>
+                <p className={`text-sm ${theme.mutedText} mb-2`}>
                   {faculty.role} • {faculty.department}
                 </p>
-                <p className={`text-xs ${theme.mutedText}`}>
+                <div className="flex flex-wrap gap-2">
+                  <span
+                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${
+                      isDark
+                        ? "bg-blue-100 text-blue-700"
+                        : "bg-blue-500/20 text-blue-300"
+                    }`}
+                  >
+                    {faculty.program}
+                  </span>
+                  <span
+                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${
+                      isDark
+                        ? "bg-purple-100 text-purple-700"
+                        : "bg-purple-500/20 text-purple-300"
+                    }`}
+                  >
+                    {faculty.stageSpecialization}
+                  </span>
+                </div>
+                <p className={`text-xs ${theme.mutedText} mt-2`}>
                   {faculty.id} • {faculty.email}
                 </p>
               </div>
             </div>
+          </div>
 
-            <div className="flex items-center gap-6 lg:border-l lg:pl-6 border-gray-200 dark:border-slate-800">
-              <div className="text-center">
-                <p className={`text-xs ${theme.mutedText} mb-1`}>
-                  Teaching Load
-                </p>
-                <p className="text-2xl font-bold">
-                  {faculty.assignedHours}
-                  <span className={`text-base ${theme.mutedText}`}>
-                    /{faculty.targetHours}
-                  </span>
-                </p>
-                <p className={`text-xs ${theme.mutedText}`}>hrs/week</p>
+          {/* Expertise Tags */}
+          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-slate-800">
+            <div className="flex flex-wrap gap-3">
+              <div className="flex items-center gap-2">
+                <Brain size={14} className="text-blue-500" />
+                <span className="text-xs font-medium">
+                  <strong>Education:</strong> {faculty.educationSpecialization}
+                </span>
               </div>
-              <div
-                className={`h-12 w-px ${
-                  isDark ? "bg-gray-200" : "bg-slate-800"
-                }`}
-              ></div>
-              <div className="text-center">
-                <p className={`text-xs ${theme.mutedText} mb-1`}>On Campus</p>
-                <p className="text-2xl font-bold">{faculty.daysOnCampus}</p>
-                <p className={`text-xs ${theme.mutedText}`}>days</p>
+              <div className="flex items-center gap-2">
+                <BookOpen size={14} className="text-emerald-500" />
+                <span className="text-xs font-medium">
+                  <strong>Subject:</strong> {faculty.subjectSpecialization}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <GraduationCap size={14} className="text-purple-500" />
+                <span className="text-xs font-medium">
+                  <strong>Research:</strong>{" "}
+                  {faculty.researchGuidance.mEdThesis} M.Ed. Thesis,{" "}
+                  {faculty.researchGuidance.projects} Projects
+                </span>
               </div>
             </div>
           </div>
         </motion.div>
 
         {/* Quick Stats Cards */}
-        <motion.div
-          className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-        >
-          <div
-            className={`p-5 rounded-xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm`}
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <div
-                className={`p-2.5 rounded-lg ${
-                  isDark ? "bg-blue-100" : "bg-blue-500/20"
-                }`}
-              >
-                <BookOpen
-                  size={18}
-                  className={isDark ? "text-blue-600" : "text-blue-400"}
-                />
-              </div>
-              <div>
-                <p className={`text-xs ${theme.mutedText}`}>Sections</p>
-                <p className="text-2xl font-bold">5</p>
-              </div>
-            </div>
-            <p className={`text-xs ${theme.mutedText}`}>
-              Total classes assigned
-            </p>
-          </div>
-
-          <div
-            className={`p-5 rounded-xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm`}
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <div
-                className={`p-2.5 rounded-lg ${
-                  isDark ? "bg-emerald-100" : "bg-emerald-500/20"
-                }`}
-              >
-                <Shield
-                  size={18}
-                  className={isDark ? "text-emerald-600" : "text-emerald-400"}
-                />
-              </div>
-              <div>
-                <p className={`text-xs ${theme.mutedText}`}>Conflicts</p>
-                <p className="text-2xl font-bold text-emerald-600">0</p>
-              </div>
-            </div>
-            <p className={`text-xs ${theme.mutedText}`}>No scheduling issues</p>
-          </div>
-
-          <div
-            className={`p-5 rounded-xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm`}
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <div
-                className={`p-2.5 rounded-lg ${
-                  isDark ? "bg-purple-100" : "bg-purple-500/20"
-                }`}
-              >
-                <Users
-                  size={18}
-                  className={isDark ? "text-purple-600" : "text-purple-400"}
-                />
-              </div>
-              <div>
-                <p className={`text-xs ${theme.mutedText}`}>Students</p>
-                <p className="text-2xl font-bold">180</p>
-              </div>
-            </div>
-            <p className={`text-xs ${theme.mutedText}`}>Across all sections</p>
-          </div>
-
-          <div
-            className={`p-5 rounded-xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm`}
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <div
-                className={`p-2.5 rounded-lg ${
-                  isDark ? "bg-amber-100" : "bg-amber-500/20"
-                }`}
-              >
-                <Award
-                  size={18}
-                  className={isDark ? "text-amber-600" : "text-amber-400"}
-                />
-              </div>
-              <div>
-                <p className={`text-xs ${theme.mutedText}`}>Completion</p>
-                <p className="text-2xl font-bold">87%</p>
-              </div>
-            </div>
-            <p className={`text-xs ${theme.mutedText}`}>Load vs target</p>
-          </div>
-        </motion.div>
+        
 
         {/* Quick Actions */}
         <motion.div
-          className="mb-8 grid grid-cols-1 sm:grid-cols-3 gap-4"
+          className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
@@ -459,10 +545,8 @@ export default function FacultyDashboard() {
             >
               <Download size={18} className="text-white" />
             </div>
-            <h3 className="font-semibold mb-1">Export Schedule</h3>
-            <p className={`text-xs ${theme.mutedText}`}>
-              Download timetable in multiple formats
-            </p>
+            <h3 className="font-semibold mb-1 text-sm">Export Schedule</h3>
+            <p className={`text-xs ${theme.mutedText}`}>Download timetable</p>
             <ChevronRight
               size={16}
               className={`mt-2 ${theme.mutedText} group-hover:translate-x-1 transition-transform`}
@@ -485,10 +569,8 @@ export default function FacultyDashboard() {
                 className={isDark ? "text-blue-600" : "text-blue-400"}
               />
             </div>
-            <h3 className="font-semibold mb-1">Availability</h3>
-            <p className={`text-xs ${theme.mutedText}`}>
-              Set preferred teaching slots
-            </p>
+            <h3 className="font-semibold mb-1 text-sm">Availability</h3>
+            <p className={`text-xs ${theme.mutedText}`}>Set preferences</p>
             <ChevronRight
               size={16}
               className={`mt-2 ${theme.mutedText} group-hover:translate-x-1 transition-transform`}
@@ -503,18 +585,16 @@ export default function FacultyDashboard() {
           >
             <div
               className={`inline-flex p-2.5 rounded-lg ${
-                isDark ? "bg-rose-100" : "bg-rose-500/20"
+                isDark ? "bg-amber-100" : "bg-amber-500/20"
               } mb-3`}
             >
               <AlertTriangle
                 size={18}
-                className={isDark ? "text-rose-600" : "text-rose-400"}
+                className={isDark ? "text-amber-600" : "text-amber-400"}
               />
             </div>
-            <h3 className="font-semibold mb-1">Report Issue</h3>
-            <p className={`text-xs ${theme.mutedText}`}>
-              Flag scheduling conflicts
-            </p>
+            <h3 className="font-semibold mb-1 text-sm">Report Issue</h3>
+            <p className={`text-xs ${theme.mutedText}`}>Flag conflicts</p>
             <ChevronRight
               size={16}
               className={`mt-2 ${theme.mutedText} group-hover:translate-x-1 transition-transform`}
@@ -522,171 +602,270 @@ export default function FacultyDashboard() {
           </motion.button>
         </motion.div>
 
-        {/* Weekly Timetable */}
-        <motion.div
-          className={`rounded-2xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm p-6 lg:p-8`}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        >
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-bold">Weekly Teaching Schedule</h2>
-            <div
-              className={`px-3 py-1.5 rounded-lg ${theme.accentBg} border ${theme.accentBorder} text-xs font-medium`}
-            >
-              Current Week
+        {/* Main Grid Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr,360px] gap-6">
+          {/* Weekly Timetable */}
+          <motion.div
+            className={`rounded-2xl border ${theme.cardBorder} ${theme.cardBg} backdrop-blur-sm p-6 lg:p-8`}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-lg font-bold">Weekly Teaching Schedule</h2>
+                <p className={`text-xs ${theme.mutedText} mt-1`}>
+                  ITEP, B.Ed., M.Ed. & Practicum Supervision
+                </p>
+              </div>
+              <div
+                className={`px-3 py-1.5 rounded-lg ${theme.accentBg} border ${theme.accentBorder} text-xs font-medium`}
+              >
+                {faculty.assignedHours}h/week
+              </div>
             </div>
-          </div>
 
-          <div className="overflow-x-auto -mx-2 px-2">
-            <table className="w-full border-collapse min-w-[800px]">
-              <thead>
-                <tr>
-                  <th
-                    className={`${theme.tableHeader} px-4 py-3 text-xs font-semibold text-left rounded-tl-lg border-b ${theme.tableBorder}`}
-                  >
-                    Time
-                  </th>
-                  {weekDays.map((day, i) => (
+            <div className="overflow-x-auto -mx-2 px-2">
+              <table className="w-full border-collapse min-w-[900px]">
+                <thead>
+                  <tr>
                     <th
-                      key={day}
-                      className={`${
-                        theme.tableHeader
-                      } px-3 py-3 text-xs font-semibold text-center border-b ${
-                        theme.tableBorder
-                      } ${i === weekDays.length - 1 ? "rounded-tr-lg" : ""}`}
+                      className={`${theme.tableHeader} px-4 py-3 text-xs font-semibold text-left rounded-tl-lg border-b ${theme.tableBorder}`}
                     >
-                      {day}
+                      Time
                     </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {slots.map((slot, slotIdx) => (
-                  <tr key={slotIdx}>
-                    <td
-                      className={`px-4 py-3 text-xs font-medium ${theme.mutedText} border-b ${theme.tableBorder}`}
-                    >
-                      {slot}
-                    </td>
-                    {weekDays.map((day) => {
-                      const session = sessions[day]?.find(
-                        (s) => s.slotIndex === slotIdx
-                      );
-                      if (!session) {
+                    {weekDays.map((day, i) => (
+                      <th
+                        key={day}
+                        className={`${
+                          theme.tableHeader
+                        } px-3 py-3 text-xs font-semibold text-center border-b ${
+                          theme.tableBorder
+                        } ${i === weekDays.length - 1 ? "rounded-tr-lg" : ""}`}
+                      >
+                        {day}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {slots.map((slot, slotIdx) => (
+                    <tr key={slotIdx}>
+                      <td
+                        className={`px-4 py-3 text-xs font-medium ${theme.mutedText} border-b ${theme.tableBorder}`}
+                      >
+                        {slot}
+                      </td>
+                      {weekDays.map((day) => {
+                        const session = sessions[day]?.find(
+                          (s) => s.slotIndex === slotIdx
+                        );
+                        if (!session) {
+                          return (
+                            <td
+                              key={day}
+                              className={`px-2 py-3 border-b ${theme.tableBorder}`}
+                            ></td>
+                          );
+                        }
+                        const typeLabel = getTypeLabel(session.type);
                         return (
                           <td
                             key={day}
-                            className={`px-2 py-3 border-b ${theme.tableBorder}`}
-                          ></td>
-                        );
-                      }
-                      const typeLabel = getTypeLabel(session.type);
-                      return (
-                        <td
-                          key={day}
-                          rowSpan={session.len}
-                          className={`px-2 py-3 border-b ${theme.tableBorder} align-top`}
-                        >
-                          <motion.div
-                            className={`p-3 rounded-lg border transition-all cursor-pointer ${getSessionColor(
-                              session.type
-                            )}`}
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
+                            rowSpan={session.len}
+                            className={`px-2 py-3 border-b ${theme.tableBorder} align-top`}
                           >
-                            <div className="flex items-start justify-between gap-2 mb-2">
-                              <p className="font-semibold text-xs leading-tight">
-                                {session.title}
-                              </p>
-                              <span
-                                className={`shrink-0 px-1.5 py-0.5 rounded text-xs font-bold text-white ${typeLabel.color}`}
+                            <motion.div
+                              className={`p-3 rounded-lg border transition-all cursor-pointer ${getSessionColor(
+                                session.category,
+                                session.isFieldWork
+                              )}`}
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                            >
+                              <div className="flex items-start justify-between gap-2 mb-2">
+                                <p className="font-semibold text-xs leading-tight">
+                                  {session.title}
+                                </p>
+                                <span
+                                  className={`shrink-0 px-1.5 py-0.5 rounded text-xs font-bold text-white ${typeLabel.color}`}
+                                >
+                                  {typeLabel.text}
+                                </span>
+                              </div>
+                              <div
+                                className={`text-xs ${theme.mutedText} space-y-1`}
                               >
-                                {typeLabel.text}
-                              </span>
-                            </div>
-                            <div
-                              className={`text-xs ${theme.mutedText} space-y-1`}
-                            >
-                              <p className="flex items-center gap-1">
-                                <MapPin size={10} />
-                                {session.room}
-                              </p>
-                              <p className="flex items-center gap-1">
-                                <Users size={10} />
-                                {session.cohort}
-                              </p>
-                            </div>
-                            <span
-                              className={`inline-block mt-2 px-2 py-0.5 rounded-md text-xs font-semibold ${
-                                isDark
-                                  ? "bg-gray-200 text-gray-700"
-                                  : "bg-slate-700 text-slate-200"
-                              }`}
-                            >
-                              {session.code}
-                            </span>
-                          </motion.div>
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                                <p className="flex items-center gap-1">
+                                  <MapPin size={10} />
+                                  {session.room}
+                                </p>
+                                <p className="flex items-center gap-1">
+                                  <Users size={10} />
+                                  {session.cohort} ({session.students})
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-1 flex-wrap mt-2">
+                                <span
+                                  className={`px-2 py-0.5 rounded-md text-xs font-semibold ${
+                                    session.category === "Education Core"
+                                      ? isDark
+                                        ? "bg-blue-100 text-blue-700"
+                                        : "bg-blue-500/20 text-blue-300"
+                                      : session.category === "Subject Pedagogy"
+                                      ? isDark
+                                        ? "bg-amber-100 text-amber-700"
+                                        : "bg-amber-500/20 text-amber-300"
+                                      : session.category === "Practicum"
+                                      ? isDark
+                                        ? "bg-emerald-100 text-emerald-700"
+                                        : "bg-emerald-500/20 text-emerald-300"
+                                      : session.category === "Research"
+                                      ? isDark
+                                        ? "bg-purple-100 text-purple-700"
+                                        : "bg-purple-500/20 text-purple-300"
+                                      : isDark
+                                      ? "bg-gray-100 text-gray-700"
+                                      : "bg-gray-500/20 text-gray-300"
+                                  }`}
+                                >
+                                  {session.category}
+                                </span>
+                                {session.isFieldWork && (
+                                  <span
+                                    className={`px-2 py-0.5 rounded-md text-xs font-semibold ${
+                                      isDark
+                                        ? "bg-rose-100 text-rose-700"
+                                        : "bg-rose-500/20 text-rose-300"
+                                    }`}
+                                  >
+                                    Field Work
+                                  </span>
+                                )}
+                              </div>
+                            </motion.div>
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
-          {/* Legend */}
-          <div className="mt-6 flex flex-wrap items-center gap-4">
-            <span className={`text-xs font-medium ${theme.mutedText}`}>
-              Session Types:
-            </span>
-            <div className="flex items-center gap-2">
-              <span
-                className={`px-2 py-1 rounded text-xs font-bold text-white ${
-                  isDark ? "bg-blue-600" : "bg-blue-500"
-                }`}
-              >
-                L
-              </span>
-              <span className={`text-xs ${theme.mutedText}`}>Lecture</span>
+            {/* Enhanced Legend */}
+            <div className="mt-6 space-y-4">
+              <div className="flex flex-wrap items-center gap-4">
+                <span className={`text-xs font-medium ${theme.mutedText}`}>
+                  Session Type:
+                </span>
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`px-2 py-1 rounded text-xs font-bold text-white ${
+                      isDark ? "bg-blue-600" : "bg-blue-500"
+                    }`}
+                  >
+                    L
+                  </span>
+                  <span className={`text-xs ${theme.mutedText}`}>Lecture</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`px-2 py-1 rounded text-xs font-bold text-white ${
+                      isDark ? "bg-amber-600" : "bg-amber-500"
+                    }`}
+                  >
+                    T
+                  </span>
+                  <span className={`text-xs ${theme.mutedText}`}>Tutorial</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`px-2 py-1 rounded text-xs font-bold text-white ${
+                      isDark ? "bg-rose-600" : "bg-rose-500"
+                    }`}
+                  >
+                    P
+                  </span>
+                  <span className={`text-xs ${theme.mutedText}`}>
+                    Practical/Field
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`px-2 py-1 rounded text-xs font-bold text-white ${
+                      isDark ? "bg-purple-600" : "bg-purple-500"
+                    }`}
+                  >
+                    S
+                  </span>
+                  <span className={`text-xs ${theme.mutedText}`}>
+                    Seminar/Supervision
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-4">
+                <span className={`text-xs font-medium ${theme.mutedText}`}>
+                  Categories:
+                </span>
+                <div className="flex items-center gap-2">
+                  <div
+                    className={`w-3 h-3 rounded ${
+                      isDark ? "bg-blue-400" : "bg-blue-500"
+                    }`}
+                  ></div>
+                  <span className={`text-xs ${theme.mutedText}`}>
+                    Education Core
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div
+                    className={`w-3 h-3 rounded ${
+                      isDark ? "bg-amber-400" : "bg-amber-500"
+                    }`}
+                  ></div>
+                  <span className={`text-xs ${theme.mutedText}`}>
+                    Subject Pedagogy
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div
+                    className={`w-3 h-3 rounded ${
+                      isDark ? "bg-emerald-400" : "bg-emerald-500"
+                    }`}
+                  ></div>
+                  <span className={`text-xs ${theme.mutedText}`}>
+                    Practicum
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div
+                    className={`w-3 h-3 rounded ${
+                      isDark ? "bg-purple-400" : "bg-purple-500"
+                    }`}
+                  ></div>
+                  <span className={`text-xs ${theme.mutedText}`}>Research</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div
+                    className={`w-3 h-3 rounded ${
+                      isDark ? "bg-rose-400" : "bg-rose-500"
+                    }`}
+                  ></div>
+                  <span className={`text-xs ${theme.mutedText}`}>
+                    Field Work
+                  </span>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <span
-                className={`px-2 py-1 rounded text-xs font-bold text-white ${
-                  isDark ? "bg-amber-600" : "bg-amber-500"
-                }`}
-              >
-                T
-              </span>
-              <span className={`text-xs ${theme.mutedText}`}>Tutorial</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span
-                className={`px-2 py-1 rounded text-xs font-bold text-white ${
-                  isDark ? "bg-emerald-600" : "bg-emerald-500"
-                }`}
-              >
-                P
-              </span>
-              <span className={`text-xs ${theme.mutedText}`}>Practical</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span
-                className={`px-2 py-1 rounded text-xs font-bold text-white ${
-                  isDark ? "bg-purple-600" : "bg-purple-500"
-                }`}
-              >
-                S
-              </span>
-              <span className={`text-xs ${theme.mutedText}`}>Seminar</span>
-            </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
       </main>
 
-      {/* Export Modal */}
+      {/* Modals remain the same as previous implementation */}
       <AnimatePresence>
+        {/* Export Modal */}
         {showExport && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -712,7 +891,8 @@ export default function FacultyDashboard() {
                 </button>
               </div>
               <p className={`text-sm ${theme.mutedText} mb-6`}>
-                Choose your preferred format to download
+                Download your teaching schedule and practicum supervision
+                calendar
               </p>
               <div className="space-y-3 mb-6">
                 {["PDF", "Excel", "ICS"].map((format) => (
@@ -746,10 +926,146 @@ export default function FacultyDashboard() {
             </motion.div>
           </motion.div>
         )}
-      </AnimatePresence>
 
-      {/* Availability Modal */}
-      <AnimatePresence>
+        {/* Practicum Modal */}
+        {showPracticumModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className={`fixed inset-0 ${theme.modalOverlay} backdrop-blur-md flex items-center justify-center z-50 p-4`}
+            onClick={() => setShowPracticumModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className={`${theme.modalBg} rounded-2xl p-6 w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-2xl border ${theme.cardBorder}`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-bold text-lg">Practicum Supervision</h3>
+                <button
+                  onClick={() => setShowPracticumModal(false)}
+                  className={`p-1.5 rounded-lg ${theme.hoverBg} transition-colors`}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+              <p className={`text-sm ${theme.mutedText} mb-6`}>
+                Manage student-teacher practicum placements and supervision
+                schedules
+              </p>
+              <div className="space-y-3">
+                {practicumStudents.map((student) => (
+                  <div
+                    key={student.id}
+                    className={`p-4 rounded-xl border ${theme.cardBorder} ${theme.accentBg}`}
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <p className="font-semibold">{student.name}</p>
+                        <p className={`text-sm ${theme.mutedText}`}>
+                          {student.id} • {student.program}
+                        </p>
+                      </div>
+                      <span
+                        className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${
+                          student.status === "Excellent"
+                            ? isDark
+                              ? "bg-emerald-100 text-emerald-700"
+                              : "bg-emerald-500/20 text-emerald-300"
+                            : student.status === "On Track"
+                            ? isDark
+                              ? "bg-blue-100 text-blue-700"
+                              : "bg-blue-500/20 text-blue-300"
+                            : isDark
+                            ? "bg-amber-100 text-amber-700"
+                            : "bg-amber-500/20 text-amber-300"
+                        }`}
+                      >
+                        {student.status}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 mb-3">
+                      <div>
+                        <p className={`text-xs ${theme.mutedText} mb-1`}>
+                          Placement School
+                        </p>
+                        <p className="text-sm font-medium">{student.school}</p>
+                      </div>
+                      <div>
+                        <p className={`text-xs ${theme.mutedText} mb-1`}>
+                          Next Visit
+                        </p>
+                        <p className="text-sm font-medium">
+                          {student.nextVisit}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mb-3">
+                      <div className="flex items-center justify-between text-xs mb-1">
+                        <span className={theme.mutedText}>Hours Progress</span>
+                        <span className="font-medium">
+                          {student.hoursCompleted}/{student.totalHours}h (
+                          {Math.round(
+                            (student.hoursCompleted / student.totalHours) * 100
+                          )}
+                          %)
+                        </span>
+                      </div>
+                      <div
+                        className={`h-2 rounded-full ${
+                          isDark ? "bg-gray-200" : "bg-slate-800"
+                        }`}
+                      >
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-rose-500 to-pink-500"
+                          style={{
+                            width: `${
+                              (student.hoursCompleted / student.totalHours) *
+                              100
+                            }%`,
+                          }}
+                        ></div>
+                      </div>
+                    </div>
+                    <div
+                      className={`p-2 rounded-lg ${
+                        isDark
+                          ? "bg-blue-50 border border-blue-200"
+                          : "bg-blue-500/10 border border-blue-500/30"
+                      }`}
+                    >
+                      <p className={`text-xs ${theme.mutedText} mb-1`}>
+                        Latest Feedback
+                      </p>
+                      <p className="text-xs font-medium">
+                        {student.lastFeedback}
+                      </p>
+                    </div>
+                    <div className="flex gap-2 mt-3">
+                      <button
+                        className={`flex-1 px-3 py-2 rounded-lg border ${theme.buttonBorder} ${theme.buttonBg} ${theme.buttonText} text-xs font-medium hover:scale-[1.02] transition-all flex items-center justify-center gap-2`}
+                      >
+                        <Eye size={14} />
+                        View Log
+                      </button>
+                      <button
+                        className={`flex-1 px-3 py-2 rounded-lg border ${theme.buttonBorder} ${theme.buttonBg} ${theme.buttonText} text-xs font-medium hover:scale-[1.02] transition-all flex items-center justify-center gap-2`}
+                      >
+                        <MessageSquare size={14} />
+                        Feedback
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {/* Availability Modal - Same as before */}
         {showAvailability && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -775,62 +1091,58 @@ export default function FacultyDashboard() {
                 </button>
               </div>
               <p className={`text-sm ${theme.mutedText} mb-6`}>
-                Mark your preferred time slots for course scheduling
+                Mark preferred time slots for teaching and practicum supervision
               </p>
 
               <form onSubmit={handleAddAvailability} className="mb-6">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-                  <div>
-                    <label className="block text-sm font-semibold mb-2">
-                      Day
-                    </label>
-                    <select
-                      name="day"
-                      required
-                      className={`w-full px-4 py-3 rounded-xl border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
-                    >
-                      <option value="">Select day</option>
-                      {weekDays.map((day) => (
-                        <option key={day} value={day}>
-                          {day}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold mb-2">
-                      Start Time
-                    </label>
-                    <select
-                      name="startTime"
-                      required
-                      className={`w-full px-4 py-3 rounded-xl border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
-                    >
-                      <option value="">Select time</option>
-                      {slots.map((slot) => (
-                        <option key={slot} value={slot}>
-                          {slot}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold mb-2">
-                      End Time
-                    </label>
-                    <select
-                      name="endTime"
-                      required
-                      className={`w-full px-4 py-3 rounded-xl border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
-                    >
-                      <option value="">Select time</option>
-                      {slots.map((slot) => (
-                        <option key={slot} value={slot}>
-                          {slot}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <CustomDropdown
+                    label="Day"
+                    name="day"
+                    id="availability-day"
+                    value={availabilityForm.day}
+                    onChange={(e) =>
+                      setAvailabilityForm({
+                        ...availabilityForm,
+                        day: e.target.value,
+                      })
+                    }
+                    options={["", ...weekDays]}
+                    theme={isDark ? "light" : "dark"}
+                    placeholder="Select day"
+                  />
+
+                  <CustomDropdown
+                    label="Start Time"
+                    name="startTime"
+                    id="availability-start"
+                    value={availabilityForm.startTime}
+                    onChange={(e) =>
+                      setAvailabilityForm({
+                        ...availabilityForm,
+                        startTime: e.target.value,
+                      })
+                    }
+                    options={["", ...slots]}
+                    theme={isDark ? "light" : "dark"}
+                    placeholder="Select time"
+                  />
+
+                  <CustomDropdown
+                    label="End Time"
+                    name="endTime"
+                    id="availability-end"
+                    value={availabilityForm.endTime}
+                    onChange={(e) =>
+                      setAvailabilityForm({
+                        ...availabilityForm,
+                        endTime: e.target.value,
+                      })
+                    }
+                    options={["", ...slots]}
+                    theme={isDark ? "light" : "dark"}
+                    placeholder="Select time"
+                  />
                 </div>
                 <button
                   type="submit"
@@ -899,10 +1211,8 @@ export default function FacultyDashboard() {
             </motion.div>
           </motion.div>
         )}
-      </AnimatePresence>
 
-      {/* Report Clash Modal */}
-      <AnimatePresence>
+        {/* Report Clash Modal */}
         {showClash && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -919,7 +1229,7 @@ export default function FacultyDashboard() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold text-lg">Report Clash</h3>
+                <h3 className="font-bold text-lg">Report Issue</h3>
                 <button
                   onClick={() => setShowClash(false)}
                   className={`p-1.5 rounded-lg ${theme.hoverBg} transition-colors`}
@@ -935,20 +1245,21 @@ export default function FacultyDashboard() {
                 }}
               >
                 <div className="space-y-4 mb-6">
-                  <div>
-                    <label className="block text-sm font-semibold mb-2">
-                      Clash Type
-                    </label>
-                    <select
-                      name="type"
-                      className={`w-full px-4 py-3 rounded-xl border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
-                    >
-                      <option value="room">Room Conflict</option>
-                      <option value="faculty">Faculty Overlap</option>
-                      <option value="student">Student Group Clash</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
+                  <CustomDropdown
+                    label="Issue Type"
+                    name="type"
+                    id="clash-type"
+                    value={clashType}
+                    onChange={(e) => setClashType(e.target.value)}
+                    options={[
+                      "Timetable Conflict",
+                      "Practicum Scheduling",
+                      "Room Unavailable",
+                      "Student Group Clash",
+                      "Other",
+                    ]}
+                    theme={isDark ? "light" : "dark"}
+                  />
                   <div>
                     <label className="block text-sm font-semibold mb-2">
                       Course/Session
@@ -956,7 +1267,7 @@ export default function FacultyDashboard() {
                     <input
                       type="text"
                       name="course"
-                      placeholder="e.g., CS201 - Mon 09:00"
+                      placeholder="e.g., ED201 - Mon 09:00"
                       className={`w-full px-4 py-3 rounded-xl border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
                     />
                   </div>
@@ -967,7 +1278,7 @@ export default function FacultyDashboard() {
                     <textarea
                       name="details"
                       rows={4}
-                      placeholder="Describe the clash in detail..."
+                      placeholder="Describe the scheduling issue or conflict..."
                       className={`w-full px-4 py-3 rounded-xl border ${theme.inputBorder} ${theme.inputBg} ${theme.inputText} text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none transition-all`}
                     ></textarea>
                   </div>

@@ -24,7 +24,6 @@ const menuItems = [
   { title: "Dashboard", url: "/dean", icon: LayoutDashboard },
   { title: "View Programs", url: "/dean/view", icon: Eye },
   { title: "View Rooms", url: "/dean/viewr", icon: DoorOpen },
-  { title: "Register HOD", url: "/dean/register", icon: UserPlus },
   { title: "Courses", url: "/dean/courses", icon: BookOpen },
   { title: "Faculties", url: "/dean/faculties", icon: UsersRound },
   { title: "Students", url: "/dean/students", icon: UserCheck },

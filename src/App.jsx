@@ -26,7 +26,7 @@ import ReportedClashes from "./pages/ReportedClashes";
 import ViewPrograms from "./pages/ViewPrograms";
 import RegisterHOD from "./pages/RegisterHOD";
 import RegisterFaculty from "./pages/RegisterFaculty";
-import StaffDashboard from "./pages/StaffDashboard";
+import CoordinatorDashboard from "./pages/CoordinatorDashboard";
 import ViewRooms from "./pages/ViewRooms";
 
 function App() {
@@ -39,7 +39,7 @@ function App() {
         <Route path="/admin" element={<AdminDashboard />}></Route>
         <Route path="/student" element={<StudentDashboard />}></Route>
         <Route path="/faculty" element={<FacultyDashboard />}></Route>
-        <Route path="/staff" element={<StaffDashboard />}></Route>
+        <Route path="/staff" element={<CoordinatorDashboard />}></Route>
 
         <Route path="/dean" element={<DashboardLayout role="dean" />}>
           <Route index element={<DeanDashboard />} />
@@ -70,6 +70,37 @@ function App() {
           <Route path="conflicts" element={<ConflictExplorer />}></Route>
           <Route path="exports" element={<ExportsPublishing />}></Route>
           <Route path="viewr" element={<ViewRooms />}></Route>
+        </Route>
+
+        <Route
+          path="/coordinator"
+          element={<DashboardLayout role="coordinator" />}
+        >
+          {/* Dashboard */}
+          <Route index element={<CoordinatorDashboard />} />
+
+          {/* Registration Routes */}
+          <Route path="register-rooms" element={<RoomsResources />} />
+          <Route path="register-faculty" element={<RegisterFaculty />} />
+          <Route path="register-hod" element={<RegisterHOD />} />
+          <Route path="register-program" element={<ProgramsFramework />} />
+          <Route path="register-course" element={<CoursesOfferings />} />
+
+          {/* View/Management Routes */}
+          <Route path="programs" element={<ViewPrograms />} />
+          <Route path="courses" element={<CoursesOfferings />} />
+          <Route path="faculty" element={<FacultyManagement />} />
+          <Route path="students" element={<StudentsEnrollments />} />
+          <Route path="rooms" element={<ViewRooms />} />
+
+          {/* Timetable Generation & Management */}
+          <Route path="generate" element={<ScenarioComposer />} />
+          <Route path="timetables" element={<Timetables />} />
+          <Route path="conflicts" element={<ConflictExplorer />} />
+
+          {/* Settings & Exports */}
+          <Route path="calendar" element={<CalendarsConstraints />} />
+          <Route path="exports" element={<ExportsPublishing />} />
         </Route>
 
         <Route path="/calendars" element={<CalendarsConstraints />}></Route>
